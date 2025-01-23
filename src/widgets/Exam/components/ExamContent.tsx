@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import React, { useState, useEffect } from "react";
 
 export default function ExamContent() {
@@ -81,7 +81,9 @@ export default function ExamContent() {
     <div className="min-h-[100vh] pt-[130px] px-4 bg-gray-100">
       <div className="max-w-4xl mx-auto bg-white shadow-lg rounded-lg p-6">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-xl font-bold text-gray-800">JEE Model Questions</h1>
+          <h1 className="text-xl font-bold text-gray-800">
+            JEE Model Questions
+          </h1>
         </div>
         <form onSubmit={handleSubmit}>
           {questions.map((q, index) => (
@@ -100,7 +102,10 @@ export default function ExamContent() {
                       className="mr-2"
                       required
                     />
-                    <label htmlFor={`q${index}_o${i}`} className="text-gray-700">
+                    <label
+                      htmlFor={`q${index}_o${i}`}
+                      className="text-gray-700"
+                    >
                       {option}
                     </label>
                   </div>
@@ -118,9 +123,7 @@ export default function ExamContent() {
           </div>
         </form>
       </div>
-      <div
-        className="fixed bottom-5 right-5 bg-red-600 text-white font-bold text-lg px-4 py-2 rounded-lg shadow-lg"
-      >
+      <div className="fixed bottom-5 right-5 bg-red-600 text-white font-bold text-lg px-4 py-2 rounded-lg shadow-lg">
         Time Remaining: {timer}s
       </div>
     </div>

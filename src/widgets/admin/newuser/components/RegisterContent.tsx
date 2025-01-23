@@ -4,16 +4,21 @@ import React, { useState } from "react";
 
 export default function RegisterContent() {
   const [email, setEmail] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [dob, setDob] = useState("");
+  const [mobile, setMobile] = useState("");
 
-  const handndleSubmit = async () => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault(); // Prevents the default form submission behavior
+
     try {
       const response = await fetch("/api/admin/sign-up", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email, dob }),
+        body: JSON.stringify({ email, firstName, lastName, dob, mobile }),
       });
 
       if (response.ok) {
@@ -32,7 +37,7 @@ export default function RegisterContent() {
   };
 
   return (
-    <div className="px-6 md:px-[5vw] w-full min-h-screen flex flex-col items-center justify-center bg-gray-50">
+    <div className="p-6 md:px-[5vw] w-full min-h-screen flex flex-col items-center justify-center bg-gray-50">
       <div className="text-center mb-8">
         <h1 className="text-3xl font-bold text-blue-700 uppercase">
           A Glimpse to <span className="text-red-600">KEAM</span>
@@ -47,7 +52,47 @@ export default function RegisterContent() {
             Please register to continue. Enter your details to create your
             account.
           </p>
-          <form>
+          <form onSubmit={handleSubmit}>
+            {/* First Name Field */}
+            <div className="mb-6">
+              <label
+                className="block text-gray-700 text-sm font-medium mb-2"
+                htmlFor="firstName"
+              >
+                First Name
+              </label>
+              <input
+                type="text"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                id="firstName"
+                name="firstName"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+                placeholder="Enter your first name"
+                required
+              />
+            </div>
+
+            {/* Last Name Field */}
+            <div className="mb-6">
+              <label
+                className="block text-gray-700 text-sm font-medium mb-2"
+                htmlFor="lastName"
+              >
+                Last Name
+              </label>
+              <input
+                type="text"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+                id="lastName"
+                name="lastName"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+                placeholder="Enter your last name"
+                required
+              />
+            </div>
+
             {/* Email Field */}
             <div className="mb-6">
               <label
@@ -58,9 +103,8 @@ export default function RegisterContent() {
               </label>
               <input
                 type="email"
-                onChange={(e)=>{
-                  setEmail(e.target.value)
-                }}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 id="email"
                 name="email"
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
@@ -79,9 +123,8 @@ export default function RegisterContent() {
               </label>
               <input
                 type="date"
-                onChange={(e)=>{
-                  setDob(e.target.value)
-                }}
+                value={dob}
+                onChange={(e) => setDob(e.target.value)}
                 id="dob"
                 name="dob"
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
@@ -89,11 +132,27 @@ export default function RegisterContent() {
               />
             </div>
 
+            {/* Mobile Field (Optional) */}
+            <div className="mb-6">
+              <label
+                className="block text-gray-700 text-sm font-medium mb-2"
+                htmlFor="mobile"
+              >
+                Mobile Number (Optional)
+              </label>
+              <input
+                type="tel"
+                value={mobile}
+                onChange={(e) => setMobile(e.target.value)}
+                id="mobile"
+                name="mobile"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+                placeholder="Enter your mobile number (optional)"
+              />
+            </div>
+
             {/* Submit Button */}
             <button
-              onClick={() => {
-                handndleSubmit();
-              }}
               type="submit"
               className="w-full bg-red-600 text-white py-3 rounded-lg hover:bg-blue-700 transition duration-300"
             >

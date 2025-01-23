@@ -2,22 +2,22 @@ import Question from "@models/Question";
 import { connectToDB } from "@utils/database";
 import { NextResponse } from "next/server";
 
-export const POST = async () => {
+export const GET = async () => {
     try {
         // Connect to the database
         await connectToDB();
 
-        // Fetch and randomize the data
-        const questions = await Question.find();
+        // Fetch questions and randomize their order
+        const questions = await Question.find({}).lean();
         const shuffledQuestions = questions.sort(() => Math.random() - 0.5);
 
-        // Return the shuffled data in the response
+        // Respond with the shuffled questions
         return NextResponse.json(
-            { message: "Data fetch successful", data: shuffledQuestions },
+            { message: "Data fetch successful", questions: shuffledQuestions },
             { status: 200 }
         );
     } catch (err) {
-        console.error(err);
+        console.error("Error fetching questions:", err);
         return NextResponse.json(
             { message: "Internal Server Error" },
             { status: 500 }

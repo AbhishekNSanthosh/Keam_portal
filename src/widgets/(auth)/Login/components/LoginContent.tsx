@@ -1,4 +1,5 @@
 "use client";
+import { error } from "console";
 import { signIn } from "next-auth/react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -21,6 +22,11 @@ export default function LoginContent() {
     if (response?.ok) {
       alert("Login successful!");
       router.push("/exam");
+    } else {
+      if (response?.error) {
+        const errorMessage = JSON.parse(response.error);
+        alert(errorMessage.message + ", " + errorMessage.desc);
+      }
     }
   };
 
