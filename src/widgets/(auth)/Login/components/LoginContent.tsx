@@ -1,5 +1,5 @@
 "use client";
-import { error } from "console";
+import customToast from "@components/CustomToast";
 import { signIn } from "next-auth/react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -8,25 +8,46 @@ import React from "react";
 export default function LoginContent() {
   const router = useRouter();
 
-  const handndleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
     const email = e.currentTarget.email.value;
     const dob = e.currentTarget.dob.value;
 
-    const response = await signIn("credentials", {
-      email: email,
-      dob: dob,
-      redirect: false,
-    });
+    try {
+      const response = await signIn("credentials", {
+        email: email,
+        dob: dob,
+        redirect: false,
+      });
 
-    if (response?.ok) {
-      alert("Login successful!");
-      router.push("/exam");
-    } else {
-      if (response?.error) {
-        const errorMessage = JSON.parse(response.error);
-        alert(errorMessage.message + ", " + errorMessage.desc);
+      if (response?.ok) {
+        // Login successful
+        customToast({
+          message: "Login Successful",
+          type: "success",
+          showIcon: true,
+        });
+        router.push("/exam");
+      } else {
+        // Handle errors from NextAuth response
+        const errorMessage = response?.error ? JSON.parse(response.error) : {};
+        customToast({
+          message: errorMessage.message || "Login Failed",
+          desc:
+            errorMessage.desc || "Please check your credentials and try again.",
+          type: "error",
+          showIcon: true,
+        });
       }
+    } catch (error: any) {
+      // Catch unexpected errors
+      console.error("An unexpected error occurred:", error);
+      customToast({
+        message: "An unexpected error occurred. Please try again.",
+        type: "error",
+        showIcon: true,
+      });
     }
   };
 
@@ -47,7 +68,7 @@ export default function LoginContent() {
             Please log in to continue. Enter your email and date of birth to
             access your account.
           </p>
-          <form onSubmit={handndleSubmit}>
+          <form onSubmit={handleSubmit}>
             {/* Email Field */}
             <div className="mb-6">
               <label

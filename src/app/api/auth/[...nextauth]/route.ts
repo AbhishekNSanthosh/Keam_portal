@@ -72,11 +72,13 @@ const handler = NextAuth({
             isSubmitted: userExist.isSubmitted || false,
           };
         } catch (err: any) {
-          const error = JSON.parse(err.message);
+          const errorMessages = JSON.parse(err.message);
+
+          // Ensure the error message is passed correctly
           throw new Error(
             JSON.stringify({
-              message: error.message || "Internal Server Error",
-              desc: error.desc || "An unexpected error occurred. Please try again later.",
+              message: errorMessages.message || "Internal Server Error",
+              desc: errorMessages.desc || "An unexpected error occurred. Please try again later.",
             })
           );
         }
