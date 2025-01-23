@@ -1,7 +1,8 @@
 import { Schema, model, models } from "mongoose";
+import Question from "./Question";
 
 const UserSchema = new Schema({
-    name: {
+    email: {
         type: String,
         required: true
     },
@@ -13,10 +14,31 @@ const UserSchema = new Schema({
         type: Number,
         default: 0
     },
+    questionsAttempted: [
+        {
+            Question: {
+                type: Schema.Types.ObjectId,
+                ref: "Question"
+            },
+            submittedAnswer: {
+                type: String
+
+            }
+        }
+    ],
+
     isAttempted: {
         type: Boolean,
         default: false
     },
+    isAdmin: {
+        type: Boolean,
+        default: false
+    },
+    isSubmitted: {
+        type: Boolean,
+        default: false
+    }
 }, { timestamps: true });
 
 const User = models.User || model("User", UserSchema);

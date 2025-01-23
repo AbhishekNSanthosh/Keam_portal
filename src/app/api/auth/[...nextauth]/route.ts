@@ -8,10 +8,12 @@ declare module "next-auth" {
   interface Session {
     user: {
       _id?: string;
-      username?: string | null;
+      email?: string | null;
       dob?: string | null;
-      isAttempted?: boolean | null;
+      isAttempted?: boolean | false;
+      isAdmin?: boolean | false;
       score?: number | null;
+      isSubmitted?: boolean | false;
     };
   }
 }
@@ -19,27 +21,27 @@ declare module "next-auth" {
 const handler = NextAuth({
   providers: [
     CredentialsProvider({
-      name: "Username and DOB Login",
+      name: "Email and DOB Login",
       credentials: {
-        username: { label: "Username", type: "text" },
+        email: { label: "Email", type: "text" },
         dob: { label: "Date of Birth", type: "date" },
       },
       async authorize(credentials) {
         await connectToDB();
 
-        if (!credentials || !credentials.username || !credentials.dob) {
+        if (!credentials || !credentials.email || !credentials.dob) {
           throw new Error(
             JSON.stringify({
               message: "Credentials not provided",
-              desc: "Please provide both username and date of birth",
+              desc: "Please provide both email and date of birth",
             })
           );
         }
 
         try {
-          // Find the user with the provided username and dob
+          // Find the user with the provided email and dob
           const userExist = await User.findOne({
-            username: credentials.username,
+            email: credentials.email,
             dob: credentials.dob,
           });
 
@@ -47,7 +49,7 @@ const handler = NextAuth({
             throw new Error(
               JSON.stringify({
                 message: "Invalid Credentials",
-                desc: "Username or date of birth is incorrect. Please try again.",
+                desc: "Email or date of birth is incorrect. Please try again.",
               })
             );
           }
@@ -55,7 +57,7 @@ const handler = NextAuth({
           // Return the user object for session handling
           return {
             id: userExist._id.toString(),
-            username: userExist.username,
+            email: userExist.email,
             dob: userExist.dob,
             isAttempted: userExist.isAttempted || false,
             score: userExist.score || 0,
@@ -80,7 +82,7 @@ const handler = NextAuth({
         if (sessionUser) {
           session.user = {
             _id: sessionUser._id.toString(),
-            username: sessionUser.username,
+            email: sessionUser.email,
             dob: sessionUser.dob,
             isAttempted: sessionUser.isAttempted,
             score: sessionUser.score,
@@ -91,7 +93,7 @@ const handler = NextAuth({
     },
     async jwt({ token, user }) {
       if (user) {
-        token.sub = (user as any)._id; // Attach user ID to token for further callbacks
+        token.sub = (user as any)._id;
       }
       return token;
     },
