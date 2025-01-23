@@ -1,7 +1,29 @@
+"use client";
+import { signIn } from "next-auth/react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import React from "react";
 
 export default function LoginContent() {
+  const router = useRouter();
+
+  const handndleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const email = e.currentTarget.email.value;
+    const dob = e.currentTarget.dob.value;
+
+    const response = await signIn("credentials", {
+      email: email,
+      dob: dob,
+      redirect: false,
+    });
+
+    if (response?.ok) {
+      alert("Login successful!");
+      router.push("/exam");
+    }
+  };
+
   return (
     <div className="px-6 md:px-[5vw] w-full min-h-screen flex flex-col items-center justify-center bg-gray-50">
       <div className="text-center mb-8">
@@ -19,7 +41,7 @@ export default function LoginContent() {
             Please log in to continue. Enter your email and date of birth to
             access your account.
           </p>
-          <form>
+          <form onSubmit={handndleSubmit}>
             {/* Email Field */}
             <div className="mb-6">
               <label
