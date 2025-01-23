@@ -4,43 +4,25 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React from "react";
 
-type SignInResponse = {
-  error: string | null; // Error message, if any
-  ok: boolean; // Whether the sign-in was successful
-  status: number; // HTTP status code
-  url: string | null; // Redirect URL (if any)
-};
-
 export default function LoginContent() {
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
     const email = e.currentTarget.email.value;
     const dob = e.currentTarget.dob.value;
 
-    try {
-      const response = await fetch("/api/admin/sign-up", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, dob }),
-      });
+    const response = await signIn("credentials", {
+      email: email,
+      dob: dob,
+      redirect: false,
+    });
 
-      if (response.ok) {
-        const data = await response.json();
-        console.log("Success:", data);
-        alert("Registration successful!");
-      } else {
-        const error = await response.json();
-        console.error("Error:", error);
-        alert("Registration failed. Please try again.");
-      }
-    } catch (err) {
-      console.error("Unexpected error:", err);
-      alert("An unexpected error occurred. Please try again later.");
+    if (response?.ok) {
+      alert("Login successful!");
+      router.push("/admin/dashboard");
+    } else {
+      alert("Login failed. Please check your credentials.");
     }
   };
 
@@ -55,7 +37,8 @@ export default function LoginContent() {
       <div className="flex flex-col md:flex-row w-full max-w-6xl bg-white overflow-hidden p-2">
         {/* Left Section - Login Form */}
         <div className="flex-[0.9] p-8 md:p-12 shadow-sm rounded-lg">
-          <h2 className="text-4xl font-bold text-gray-800 mb-6">Register</h2>
+          {/* Title */}
+          <h2 className="text-4xl font-bold text-gray-800 mb-6">Admin Login</h2>
           <p className="text-gray-600 mb-8">
             Please log in to access the admin panel. Enter your email and date
             of birth to continue.
