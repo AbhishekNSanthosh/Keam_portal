@@ -20,15 +20,18 @@ export default function LoginContent() {
         dob: dob,
         redirect: false, // Ensures it won't redirect automatically
       });
-  
+      console.log(response)
       if (response?.ok) {
         // Login successful
         customToast({
           message: "Login Successful",
+          desc:"Redirecting to Dashboard",
           type: "success",
           showIcon: true,
         });
-        // router.push("/exam"); // Navigate to exam page
+       setTimeout(() => {
+        router.push("/exam"); // Navigate to exam page
+       }, 300);
       } else {
         // Handle errors from NextAuth response
         const errorMessage = response?.error ? JSON.parse(response.error) : {};
