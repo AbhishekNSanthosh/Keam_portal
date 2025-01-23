@@ -19,11 +19,13 @@ export default function RootLayout({
     <div>
       <Provider>
         <SessionWrapper admin={true}>
-          <div className="flex items-center flex-row w-full">
+          <div className="flex items-center flex-row w-screen">
             <AdminSidebar />
             <div className="flex flex-col w-full">
               <AdminHeader />
-              <div className="bg-red-50 w-full h-[88vh]">{children}</div>
+              <main className="min-h-[100vh] h-auto rounded-[5px] pt-[14.5vh] pl-[19vw] pr-[2vw] pb-[1vw] w-[99.5vw] flex  bg-red-50 bg-opacity-45">
+                <div className="w-full h-full relative">{children}</div>
+              </main>
             </div>
           </div>
         </SessionWrapper>

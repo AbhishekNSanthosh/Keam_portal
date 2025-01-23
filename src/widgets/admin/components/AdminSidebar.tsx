@@ -26,7 +26,7 @@ export default function AdminSidebar() {
       },
   ];
   return (
-    <div className="py-[2vw] flex flex-col w-[18vw] items-start h-[100vh] fixed left-0 bg-white">
+    <div className="w-[18vw] h-screen pt-[2rem] fixed bg-white">
       <div className="flex flex-col justify-center items-center px-[2vw] text-gray-700">
         <span className="text-base font-semibold">A Glimpse To KEAM</span>
         <span className="text-xs font-normal">

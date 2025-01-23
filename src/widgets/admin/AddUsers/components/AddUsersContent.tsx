@@ -2,7 +2,7 @@ import React from 'react';
 
 export default function AddUsersContent() {
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4">
+    <div className="flex flex-col items-center justify-center bg-gray-100 p-4">
       <h1 className="text-2xl font-bold mb-6">Add User</h1>
       <form className="bg-white shadow-md rounded-lg p-6 w-full max-w-md">
         <div className="mb-4">
