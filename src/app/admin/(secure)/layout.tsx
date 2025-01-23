@@ -17,7 +17,7 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <Provider>
-          <SessionWrapper>{children}</SessionWrapper>
+          <SessionWrapper admin={true}>{children}</SessionWrapper>
         </Provider>
       </body>
     </html>

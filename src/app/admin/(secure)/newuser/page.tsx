@@ -1,4 +1,4 @@
-import Register from "@widgets/admin/Login/view";
+import Register from "@widgets/admin/newuser/view";
 
 const page = () => {
   return <Register />;
