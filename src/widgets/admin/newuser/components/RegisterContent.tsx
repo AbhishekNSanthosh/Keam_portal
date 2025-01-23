@@ -1,13 +1,12 @@
 "use client";
 import Image from "next/image";
-import React from "react";
+import React, { useState } from "react";
 
 export default function RegisterContent() {
-  const handndleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const email = e.currentTarget.email.value;
-    const dob = e.currentTarget.dob.value;
+  const [email, setEmail] = useState("");
+  const [dob, setDob] = useState("");
 
+  const handndleSubmit = async () => {
     try {
       const response = await fetch("/api/admin/sign-up", {
         method: "POST",
@@ -48,7 +47,7 @@ export default function RegisterContent() {
             Please register to continue. Enter your details to create your
             account.
           </p>
-          <form onSubmit={handndleSubmit}>
+          <form>
             {/* Email Field */}
             <div className="mb-6">
               <label
@@ -59,6 +58,9 @@ export default function RegisterContent() {
               </label>
               <input
                 type="email"
+                onChange={(e)=>{
+                  setEmail(e.target.value)
+                }}
                 id="email"
                 name="email"
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
@@ -77,6 +79,9 @@ export default function RegisterContent() {
               </label>
               <input
                 type="date"
+                onChange={(e)=>{
+                  setDob(e.target.value)
+                }}
                 id="dob"
                 name="dob"
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
@@ -86,6 +91,9 @@ export default function RegisterContent() {
 
             {/* Submit Button */}
             <button
+              onClick={() => {
+                handndleSubmit();
+              }}
               type="submit"
               className="w-full bg-red-600 text-white py-3 rounded-lg hover:bg-blue-700 transition duration-300"
             >
