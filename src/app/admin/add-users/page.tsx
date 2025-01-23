@@ -1,7 +1,8 @@
-import Register from "@widgets/admin/Login/view";
+import AddUsers from '@widgets/admin/AddUsers'
+import React from 'react'
 
-const page = () => {
-  return <Register />;
-};
-
-export default page;
+export default function page() {
+  return (
+   <AddUsers/>
+  )
+}
