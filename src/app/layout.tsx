@@ -1,6 +1,7 @@
 import Provider from "@components/Provider";
 import "@styles/scss/main.scss";
 import type { Metadata } from "next";
+import { Toaster } from "react-hot-toast";
 
 export const metadata: Metadata = {
   title: "A Glimpse to KEAM",
@@ -15,6 +16,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
+        <Toaster
+          position="bottom-center"
+          reverseOrder={false}
+          toastOptions={{
+            duration: 3000,
+          }}
+        />
         <Provider>{children}</Provider>
       </body>
     </html>
