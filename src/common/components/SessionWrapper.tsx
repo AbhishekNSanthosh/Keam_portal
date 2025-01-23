@@ -8,7 +8,7 @@ const SessionWrapper = ({ children }: { children: React.ReactNode }) => {
   if (status === "loading") {
     return <div>Loading...</div>;
   }
-  //  else if (status === "unauthenticated") {
+  // else if (status === "unauthenticated") {
   //   return <div>Unauthenticated</div>;
   // }
 
