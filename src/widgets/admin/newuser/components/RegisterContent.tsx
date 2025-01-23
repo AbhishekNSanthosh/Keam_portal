@@ -167,9 +167,9 @@ export default function RegisterContent() {
             <Image
               src="/exam.svg"
               alt="Illustration"
-              className="w-full h-auto object-contain"
               width={800}
               height={800}
+              className="w-full h-auto object-contain"
             />
           </div>
         </div>
