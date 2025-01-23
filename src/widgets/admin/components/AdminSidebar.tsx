@@ -4,6 +4,7 @@ import React from "react";
 import { MdSpaceDashboard } from "react-icons/md";
 import { IoMdListBox } from "react-icons/io";
 import { usePathname } from "next/navigation";
+import { HiUserAdd } from "react-icons/hi";
 
 export default function AdminSidebar() {
   const location = usePathname();
@@ -15,9 +16,14 @@ export default function AdminSidebar() {
     },
     {
       title: "View Questions",
-      link: "/",
+      link: "/admin/view-questions",
       icon: <IoMdListBox className="" />,
     },
+    {
+        title: "Add Users",
+        link: "/admin/add-users",
+        icon: <HiUserAdd className="" />,
+      },
   ];
   return (
     <div className="py-[2vw] flex flex-col w-[18vw] relative items-start h-[100vh]">
