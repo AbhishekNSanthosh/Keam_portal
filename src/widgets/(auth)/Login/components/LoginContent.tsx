@@ -28,7 +28,6 @@ export default function LoginContent() {
           type: "success",
           showIcon: true,
         });
-        router.push("/exam");
         setTimeout(() => {
           router.push("/exam"); // Navigate to exam page
         }, 300);
