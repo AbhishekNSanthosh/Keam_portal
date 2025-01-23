@@ -1,7 +1,7 @@
-import React from "react";
+import Register from "@widgets/admin/Login/view";
 
 const page = () => {
-  return <div>page</div>;
+  return <Register />;
 };
 
 export default page;
