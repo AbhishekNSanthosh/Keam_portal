@@ -78,13 +78,10 @@ export default function ExamContent() {
   };
 
   return (
-    <div className="min-h-[100vh] pt-[100px] px-4 bg-gray-100">
+    <div className="min-h-[100vh] pt-[130px] px-4 bg-gray-100">
       <div className="max-w-4xl mx-auto bg-white shadow-lg rounded-lg p-6">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-xl font-bold text-gray-800">JEE Model Questions</h1>
-          <div className="text-red-600 font-bold text-lg">
-            Time Remaining: {timer}s
-          </div>
         </div>
         <form onSubmit={handleSubmit}>
           {questions.map((q, index) => (
@@ -120,6 +117,11 @@ export default function ExamContent() {
             </button>
           </div>
         </form>
+      </div>
+      <div
+        className="fixed bottom-5 right-5 bg-red-600 text-white font-bold text-lg px-4 py-2 rounded-lg shadow-lg"
+      >
+        Time Remaining: {timer}s
       </div>
     </div>
   );
