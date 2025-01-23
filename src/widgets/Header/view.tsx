@@ -11,8 +11,9 @@ export default function Header() {
           </span>
         </div>
       </div>
-      <div className="flex-1 flex flex-row items-center justify-end">
-        h
+      <div className="flex-1 flex flex-row items-center justify-end gap-3">
+       <span className=""> Hey, Abhishek Santhosh</span>
+       <span className=""> Profile</span>
       </div>
     </div>
   );
