@@ -1,5 +1,4 @@
 import { Schema, model, models } from "mongoose";
-import Question from "./Question";
 
 const UserSchema = new Schema({
     email: {
