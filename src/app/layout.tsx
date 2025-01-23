@@ -1,4 +1,4 @@
-
+import Provider from "@components/Provider";
 import "@styles/scss/main.scss";
 import type { Metadata } from "next";
 
@@ -15,7 +15,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        {children}
+        <Provider>{children}</Provider>
       </body>
     </html>
   );
