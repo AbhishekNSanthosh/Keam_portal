@@ -1,23 +1,24 @@
-import Image from "next/image";
-import React from "react";
+import Image from 'next/image';
+import React from 'react';
 
 export default function LoginContent() {
   return (
     <div className="px-6 md:px-[5vw] w-full min-h-screen flex flex-col items-center justify-center bg-gray-50">
-      <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-blue-700 uppercase">
-          A Glimpse to <span className="text-red-600">KEAM</span>
-        </h1>
-        <p className="text-gray-600 text-sm">Mock Test for KEAM Aspirants</p>
-      </div>
+          <div className="text-center mb-8">
+            <h1 className="text-3xl font-bold text-blue-700 uppercase">
+              A Glimpse to <span className="text-red-600">KEAM</span>
+            </h1>
+            <p className="text-gray-600 text-sm">
+              Mock Test for KEAM Aspirants
+            </p>
+          </div>
       <div className="flex flex-col md:flex-row w-full max-w-6xl bg-white overflow-hidden p-2">
         {/* Left Section - Login Form */}
         <div className="flex-[0.9] p-8 md:p-12 shadow-sm rounded-lg">
           {/* Title */}
           <h2 className="text-4xl font-bold text-gray-800 mb-6">Login</h2>
           <p className="text-gray-600 mb-8">
-            Please log in to continue. Enter your email and date of birth to
-            access your account.
+            Please log in to continue. Enter your email and date of birth to access your account.
           </p>
           <form>
             {/* Email Field */}
