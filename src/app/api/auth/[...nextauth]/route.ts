@@ -60,7 +60,9 @@ const handler = NextAuth({
             email: userExist.email,
             dob: userExist.dob,
             isAttempted: userExist.isAttempted || false,
+            isAdmin: userExist.isAdmin || false, // Ensure isAdmin is included
             score: userExist.score || 0,
+            isSubmitted: userExist.isSubmitted || false, // Ensure isSubmitted is included
           };
         } catch (err: any) {
           throw new Error(
@@ -85,7 +87,9 @@ const handler = NextAuth({
             email: sessionUser.email,
             dob: sessionUser.dob,
             isAttempted: sessionUser.isAttempted,
+            isAdmin: sessionUser.isAdmin, // Include isAdmin in the session
             score: sessionUser.score,
+            isSubmitted: sessionUser.isSubmitted, // Include isSubmitted in the session
           };
         }
       }
@@ -93,7 +97,8 @@ const handler = NextAuth({
     },
     async jwt({ token, user }) {
       if (user) {
-        token.sub = (user as any)._id;
+        token.sub = (user as any).id;
+        token.isAdmin = (user as any).isAdmin;
       }
       return token;
     },
