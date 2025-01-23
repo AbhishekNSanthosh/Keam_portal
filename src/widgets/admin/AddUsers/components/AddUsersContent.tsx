@@ -2,8 +2,8 @@ import React from 'react';
 
 export default function AddUsersContent() {
   return (
-    <div className="flex flex-col items-center justify-center bg-gray-100 p-4">
-      <h1 className="text-2xl font-bold mb-6">Add User</h1>
+    <div className="flex flex-col items-center justify-center bg-white p-4 h-full">
+      <h1 className="text-2xl font-semibold text-red-600 mb-6">Add User</h1>
       <form className="bg-white shadow-md rounded-lg p-6 w-full max-w-md">
         <div className="mb-4">
           <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
@@ -32,7 +32,7 @@ export default function AddUsersContent() {
         </div>
         <button
           type="submit"
-          className="w-full bg-blue-500 text-white font-semibold py-2 rounded-md hover:bg-blue-600 transition duration-200"
+          className="w-full bg-red-500 text-white font-semibold py-2 rounded-md hover:bg-blue-600 transition duration-200"
         >
           Add User
         </button>

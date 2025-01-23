@@ -23,8 +23,8 @@ export default function RootLayout({
             <AdminSidebar />
             <div className="flex flex-col w-full">
               <AdminHeader />
-              <main className="min-h-[100vh] h-auto rounded-[5px] pt-[14.5vh] pl-[19vw] pr-[2vw] pb-[1vw] w-[99.5vw] flex  bg-red-50 bg-opacity-45">
-                <div className="w-full h-full relative">{children}</div>
+              <main className="min-h-[100vh] h-auto rounded-[5px] pt-[15vh] pl-[19vw] pr-[1vw] pb-[1vw] w-[99.5vw] flex  bg-red-50 bg-opacity-45">
+                <div className="w-full h-[82vh] relative">{children}</div>
               </main>
             </div>
           </div>

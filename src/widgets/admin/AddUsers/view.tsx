@@ -3,7 +3,7 @@ import AddUsersContent from './components/AddUsersContent'
 
 export default function AddUsers() {
   return (
-   <main>
+   <main className='h-full'>
     <AddUsersContent/>
    </main>
   )
