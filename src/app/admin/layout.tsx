@@ -1,6 +1,8 @@
 import Provider from "@components/Provider";
 import SessionWrapper from "@components/SessionWrapper";
 import "@styles/scss/main.scss";
+import AdminHeader from "@widgets/admin/components/AdminHeader";
+import AdminSidebar from "@widgets/admin/components/AdminSidebar";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -14,12 +16,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body>
-        <Provider>
-          <SessionWrapper>{children}</SessionWrapper>
-        </Provider>
-      </body>
-    </html>
+    <div>
+      <Provider>
+        <SessionWrapper>
+          <div className="flex items-center flex-row w-full">
+            <AdminSidebar />
+            <div className="flex flex-col w-full">
+              <AdminHeader />
+              <div className="bg-red-50 w-full h-[88vh]">{children}</div>
+            </div>
+          </div>
+        </SessionWrapper>
+      </Provider>
+    </div>
   );
 }

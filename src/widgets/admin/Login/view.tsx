@@ -1,7 +1,7 @@
 import React from "react";
 import LoginContent from "./components/LoginContent";
 
-export default function Register() {
+export default function AdminLogin() {
   return (
     <main>
       <LoginContent />
