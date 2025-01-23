@@ -6,7 +6,8 @@ export default function RegisterContent() {
   const [email, setEmail] = useState("");
   const [dob, setDob] = useState("");
 
-  const handndleSubmit = async () => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault(); // Prevent default form submission behavior
     try {
       const response = await fetch("/api/admin/sign-up", {
         method: "POST",
@@ -44,10 +45,9 @@ export default function RegisterContent() {
         <div className="flex-[0.9] p-8 md:p-12 shadow-sm rounded-lg">
           <h2 className="text-4xl font-bold text-gray-800 mb-6">Register</h2>
           <p className="text-gray-600 mb-8">
-            Please register to continue. Enter your details to create your
-            account.
+            Please register to continue. Enter your details to create your account.
           </p>
-          <form>
+          <form onSubmit={handleSubmit}>
             {/* Email Field */}
             <div className="mb-6">
               <label
@@ -58,9 +58,7 @@ export default function RegisterContent() {
               </label>
               <input
                 type="email"
-                onChange={(e)=>{
-                  setEmail(e.target.value)
-                }}
+                onChange={(e) => setEmail(e.target.value)}
                 id="email"
                 name="email"
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
@@ -79,9 +77,7 @@ export default function RegisterContent() {
               </label>
               <input
                 type="date"
-                onChange={(e)=>{
-                  setDob(e.target.value)
-                }}
+                onChange={(e) => setDob(e.target.value)}
                 id="dob"
                 name="dob"
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
@@ -91,9 +87,6 @@ export default function RegisterContent() {
 
             {/* Submit Button */}
             <button
-              onClick={() => {
-                handndleSubmit();
-              }}
               type="submit"
               className="w-full bg-red-600 text-white py-3 rounded-lg hover:bg-blue-700 transition duration-300"
             >
@@ -108,9 +101,9 @@ export default function RegisterContent() {
             <Image
               src="/exam.svg"
               alt="Illustration"
-              className="w-full h-auto object-contain"
               width={800}
               height={800}
+              className="w-full h-auto object-contain"
             />
           </div>
         </div>

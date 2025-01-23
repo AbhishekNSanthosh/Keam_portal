@@ -9,11 +9,11 @@ export const POST = async () => {
 
         // Fetch and randomize the data
         const questions = await Question.find();
-        // const shuffledQuestions = questions.sort(() => Math.random() - 0.5);
+        const shuffledQuestions = questions.sort(() => Math.random() - 0.5);
 
         // Return the shuffled data in the response
         return NextResponse.json(
-            { message: "Data fetch successful", data: questions },
+            { message: "Data fetch successful", data: shuffledQuestions },
             { status: 200 }
         );
     } catch (err) {
