@@ -14,13 +14,14 @@ const SessionWrapper = ({
 
   if (status === "loading") {
     return <div>Loading...</div>;
-  } else if (status === "unauthenticated") {
-    return <div>Unauthenticated</div>;
-  } else {
-    if (admin! && !session?.user?.isAdmin) {
-      return <div>Unauthorized Access</div>;
-    }
   }
+  // else if (status === "unauthenticated") {
+  //   return <div>Unauthenticated</div>;
+  // }
+  // else {
+  //   if (admin! && !session?.user?.isAdmin) {
+  //     return <div>Unauthorized Access</div>;
+  //   }
 
   return <>{children}</>;
 };
