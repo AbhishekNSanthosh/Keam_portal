@@ -4,7 +4,7 @@ import Content from './components/Content'
 
 export default function LandingPageView() {
   return (
-    <main>
+    <main className='bg-gray-100'>
       <Header/>
       <Content/>
     </main>

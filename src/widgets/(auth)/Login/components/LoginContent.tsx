@@ -14,7 +14,7 @@ export default function LoginContent() {
           </div>
       <div className="flex flex-col md:flex-row w-full max-w-6xl bg-white overflow-hidden p-2">
         {/* Left Section - Login Form */}
-        <div className="flex-[0.9] p-8 md:p-12 shadow-lg rounded-sm">
+        <div className="flex-[0.9] p-8 md:p-12 shadow-sm rounded-lg">
           {/* Title */}
           <h2 className="text-4xl font-bold text-gray-800 mb-6">Login</h2>
           <p className="text-gray-600 mb-8">
