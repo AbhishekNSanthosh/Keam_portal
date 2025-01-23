@@ -18,7 +18,7 @@ export default function RootLayout({
   return (
     <div>
       <Provider>
-        <SessionWrapper>
+        <SessionWrapper admin={true}>
           <div className="flex items-center flex-row w-full">
             <AdminSidebar />
             <div className="flex flex-col w-full">
