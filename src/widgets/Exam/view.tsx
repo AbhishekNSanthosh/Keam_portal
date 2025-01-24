@@ -1,13 +1,35 @@
-import Header from '@widgets/Header'
-import React from 'react'
+"use client";
+import React, { useEffect, useState } from "react";
 import ExamContent from './components/ExamContent'
-import ExamHeader from './components/ExamHeader'
+import PreLoader from "@components/PreLoader";
+import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 
-export default function Exam() {
+export default function LandingPageView() {
+  const [isLoaded, setIsLoaded] = useState(false);
+  const { data: session, status } = useSession();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      // Redirect to home page
+      router.push("/login");
+    }
+  }, [status, session, router]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoaded(true);
+    }, 800);
+
+    return () => clearTimeout(timer);
+  }, []);
+  
   return (
-    <main>
-        {/* <ExamHeader/> */}
-        <ExamContent/>
+    <main className="bg-gray-100">
+      {!isLoaded && <PreLoader />}
+      <ExamContent/>
     </main>
-  )
+  );
 }
+
