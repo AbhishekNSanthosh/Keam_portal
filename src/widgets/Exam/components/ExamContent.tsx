@@ -28,7 +28,7 @@ interface ExamContentProps {
 }
 
 export default function ExamContent({ handleLoading }: ExamContentProps) {
-  const [timer, setTimer] = useState(60); // Initial timer set to 60 seconds
+  const [timer, setTimer] = useState(7200); // Initial timer set to 60 seconds
   const [questions, setQuestions] = useState<Question[]>([]);
   const [selectedAnswers, setSelectedAnswers] = useState<
     { _id: string; selectedValue: string }[]
@@ -137,7 +137,6 @@ export default function ExamContent({ handleLoading }: ExamContentProps) {
     }
   }, [timer, finished]);
 
-
   if (typeof window !== "undefined") {
     const unloadHandler = function () {
       return "Your work will be lost.";
@@ -240,7 +239,16 @@ export default function ExamContent({ handleLoading }: ExamContentProps) {
 
         {/* Timer */}
         <div className="fixed bottom-5 right-5 bg-red-600 text-white font-bold text-lg px-4 py-2 rounded-lg shadow-lg">
-          Time Remaining: {timer}s
+          Time Remaining:{" "}
+          {Math.floor(timer / 3600)
+    .toString()
+    .padStart(2, "0")}
+  :
+  {Math.floor((timer % 3600) / 60)
+    .toString()
+    .padStart(2, "0")}
+  :
+  {(timer % 60).toString().padStart(2, "0")}
         </div>
       </div>
     </main>
