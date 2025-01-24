@@ -14,8 +14,8 @@ export const connectToDB = async () => {
     if (!process.env.MONGODB_URI) {
       throw new Error("MONGODB_URL is not defined in the environment variables.");
     }
-    
-    await mongoose.connect(process.env.MONGODB_URI, {
+    const MONGODB_URI = process.env.MONGODB_URI
+    await mongoose.connect(MONGODB_URI, {
       dbName: "keamportal",
       writeConcern: { w: "majority" },
     });
