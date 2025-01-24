@@ -1,7 +1,10 @@
 import React from 'react'
+import ViewUserContent from './components/ViewUsersContent'
 
 export default function ViewUsers() {
   return (
-    <div>ViewUsers</div>
+    <main>
+      <ViewUserContent/>
+    </main>
   )
 }
