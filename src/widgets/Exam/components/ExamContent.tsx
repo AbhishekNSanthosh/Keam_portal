@@ -1,4 +1,6 @@
+import customToast from "@components/CustomToast";
 import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import React, { useState, useEffect } from "react";
 
 interface Question {
@@ -34,7 +36,8 @@ export default function ExamContent({ handleLoading }: ExamContentProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { data: session } = useSession();
-
+  const [finished, setFinished] = useState(false);
+  const router = useRouter();
   // Track if there are unsaved changes
   const [isUnsavedChanges, setIsUnsavedChanges] = useState(false);
 
@@ -73,12 +76,24 @@ export default function ExamContent({ handleLoading }: ExamContentProps) {
       }
 
       const result = await res.json();
-      alert("Submission successful!");
+      customToast({
+        message: "Finished",
+        type: "success",
+        showIcon: true,
+      });
+      setFinished(true);
+      setTimeout(() => {
+        router.push("/success");
+      }, 200);
       console.log("API response:", result);
       setIsUnsavedChanges(false); // Reset unsaved changes after submission
     } catch (error: any) {
       console.error("Error submitting answers:", error);
-      alert("Failed to submit answers. Please try again.");
+      customToast({
+        message: "Failed to submit answers",
+        type: "error",
+        showIcon: true,
+      });
     }
   };
 
@@ -109,22 +124,13 @@ export default function ExamContent({ handleLoading }: ExamContentProps) {
 
   useEffect(() => {
     getQuestions();
+  }, []);
 
-    // Handle beforeunload event
-    const beforeUnloadHandler = (event: BeforeUnloadEvent) => {
-      if (isUnsavedChanges) {
-        const message = "You have unsaved changes. Are you sure you want to leave?";
-        event.returnValue = message; // Standard for most browsers
-        return message; // For some browsers like Chrome
-      }
+  if (!finished) {
+    window.onbeforeunload = function () {
+      return "Your work will be lost.";
     };
-
-    window.addEventListener("beforeunload", beforeUnloadHandler);
-
-    return () => {
-      window.removeEventListener("beforeunload", beforeUnloadHandler);
-    };
-  }, [isUnsavedChanges]);
+  }
 
   return (
     <main>
