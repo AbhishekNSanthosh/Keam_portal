@@ -1,8 +1,9 @@
-import AddUsers from '@widgets/admin/AddUsers'
+
+import AddUser from '@widgets/admin/AddUser/view'
 import React from 'react'
 
 export default function page() {
   return (
-   <AddUsers/>
+   <AddUser/>
   )
 }
