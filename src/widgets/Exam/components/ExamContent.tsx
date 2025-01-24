@@ -1,3 +1,4 @@
+import customToast from "@components/CustomToast";
 import { useSession } from "next-auth/react";
 import React, { useState, useEffect } from "react";
 
@@ -73,12 +74,20 @@ export default function ExamContent({ handleLoading }: ExamContentProps) {
       }
 
       const result = await res.json();
-      alert("Submission successful!");
+      customToast({
+        message:"Finished",
+        type:"success",
+        showIcon:true
+      })
       console.log("API response:", result);
       setIsUnsavedChanges(false); // Reset unsaved changes after submission
     } catch (error: any) {
       console.error("Error submitting answers:", error);
-      alert("Failed to submit answers. Please try again.");
+      customToast({
+        message:"Failed to submit answers",
+        type:"error",
+        showIcon:true
+      })
     }
   };
 

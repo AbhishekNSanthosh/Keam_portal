@@ -1,9 +1,8 @@
-
-import LoginUser from '@widgets/(auth)/Login/view'
+import Success from '@widgets/Success'
 import React from 'react'
 
 export default function page() {
   return (
-    <LoginUser/>
+    <Success/>
   )
 }

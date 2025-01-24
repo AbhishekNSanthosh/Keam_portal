@@ -3,9 +3,9 @@ import React, { useEffect, useState } from "react";
 import PreLoader from "@components/PreLoader";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
-import LoginContent from "@widgets/admin/Login/components/LoginContent";
+import LoginContent from "./components/LoginContent";
 
-export default function Login() {
+export default function LoginUser() {
   const [isLoaded, setIsLoaded] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { data: session, status } = useSession();
