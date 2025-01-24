@@ -1,6 +1,6 @@
 "use client";
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useEffect } from "react";
 
 const SessionWrapper = ({
@@ -10,6 +10,7 @@ const SessionWrapper = ({
   admin?: boolean;
   children: React.ReactNode;
 }) => {
+  const pathname = usePathname();
   const { data: session, status } = useSession() as {
     data: { user: { isAdmin: boolean } } | null;
     status: string;
@@ -17,28 +18,31 @@ const SessionWrapper = ({
   const router = useRouter();
 
   useEffect(() => {
-    const checkSession = async () => {
-      if (status === "unauthenticated") {
-        await new Promise((resolve) => setTimeout(resolve, 1000)); // 1-second delay;
-        if (admin && !session?.user.isAdmin) {
-          router.push("/admin/login");
-        } else {
+    const handleRedirect = async () => {
+      if (status === "loading") {
+        return;
+      }
+      if (session) {
+        // User is authenticated
+        if (admin && !session.user.isAdmin) {
+          // If admin access is required but user is not an admin
           router.push("/login");
+        } else if (session.user.isAdmin && pathname === "/admin/login") {
+          router.push("/admin"); // Redirect to admin dashboard or another appropriate page
         }
-      } else if (session?.user.isAdmin) {
-        router.push("/admin");
-      } else {
-        router.push("/");
+      } else if (status === "unauthenticated" && !session) {
+        // router.push("/login");
       }
     };
 
-    checkSession();
-  }, [status, session, admin, router]);
+    handleRedirect();
+  }, [status, session, admin, router, pathname]);
 
-  if (status === "loading" || status == "unauthenticated") {
-    return <div>Loading...</div>;
+  if (status === "loading" || status === "unauthenticated") {
+    return <div>Loading...</div>; // Show loading state
   }
 
+  // If authenticated and no redirects are needed, render children
   return <>{children}</>;
 };
 
