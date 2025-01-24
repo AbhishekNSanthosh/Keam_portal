@@ -1,40 +1,50 @@
-import { connectToDB } from "@utils/database";
-import User from "@models/User";
+"use client";
 
-export const fetchCache = "no-store";
+import { useState, useEffect } from "react";
 
-const ViewUserContent = async () => {
-  // Connect to the database
-  await connectToDB();
+const ViewStudentsPage = () => {
+  const [students, setStudents] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Define the Student interface
-  interface Student {
-    _id: string;
-    firstName: string;
-    lastName: string;
-    email: string;
-    phone?: string;
-  }
+  // Fetch students from the API
+  const fetchStudents = async () => {
+    try {
+      const response = await fetch("/api/admin/students", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
-  // Fetch students who are not admins
-  const students: Student[] = (
-    await User.find({ isAdmin: { $ne: true } }).lean()
-  ).map((user: any) => ({
-    _id: user._id,
-    firstName: user.firstName,
-    lastName: user.lastName,
-    email: user.email,
-    phone: user.phone,
-  }));
+      const data = await response.json();
+      if (data.success) {
+        setStudents(data.students);
+      } else {
+        throw new Error(data.message || "Failed to fetch students");
+      }
+    } catch (err: any) {
+      setError(err.message || "An error occurred");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  // Render the list of students
+  useEffect(() => {
+    fetchStudents();
+  }, []);
+
   return (
     <div className="h-full bg-white flex items-center justify-center py-8">
       <div className="bg-white shadow-sm rounded-lg w-full max-w-4xl p-6">
         <h1 className="text-2xl font-bold text-gray-800 mb-6 text-center">
           Student List
         </h1>
-        {students.length > 0 ? (
+        {loading ? (
+          <p className="text-gray-600 text-center">Loading...</p>
+        ) : error ? (
+          <p className="text-red-600 text-center">{error}</p>
+        ) : students.length > 0 ? (
           <div className="space-y-4">
             {students.map((student) => (
               <div
@@ -61,4 +71,4 @@ const ViewUserContent = async () => {
   );
 };
 
-export default ViewUserContent;
+export default ViewStudentsPage;

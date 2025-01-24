@@ -1,15 +1,37 @@
-import { connectToDB } from "@utils/database";
-import User from "@models/User";
+"use client";
 
-export const fetchCache = "no-store";
+import { useState, useEffect } from "react";
 
-const ViewScoreContent = async () => {
-  await connectToDB();
+const ViewScoresPage = () => {
+  const [students, setStudents] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const students = await User.find({ isAdmin: { $ne: true } })
-    .sort({ score: -1 })
-    .select("firstName lastName score")
-    .lean();
+  // Fetch scores from the API
+  const fetchScores = async () => {
+    try {
+      const response = await fetch("/api/admin/scores", { method: "POST" });
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch scores.");
+      }
+
+      const data = await response.json();
+      if (data.success) {
+        setStudents(data.students);
+      } else {
+        throw new Error(data.message || "Failed to fetch data.");
+      }
+    } catch (err: any) {
+      setError(err.message || "An error occurred");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchScores();
+  }, []);
 
   return (
     <div className="h-full bg-white flex items-center justify-center py-8">
@@ -17,11 +39,15 @@ const ViewScoreContent = async () => {
         <h1 className="text-2xl font-bold text-gray-800 mb-6 text-center">
           Student Rankings
         </h1>
-        {students.length > 0 ? (
+        {loading ? (
+          <p className="text-center text-gray-600">Loading...</p>
+        ) : error ? (
+          <p className="text-center text-red-600">{error}</p>
+        ) : students.length > 0 ? (
           <div className="space-y-4">
             {students.map((student, index) => (
               <div
-                key={(student._id as string) || index.toString()}
+                key={student._id || index}
                 className="p-4 border border-gray-200 rounded-lg hover:shadow-md transition"
               >
                 <p className="text-lg font-medium text-gray-700">
@@ -40,4 +66,4 @@ const ViewScoreContent = async () => {
   );
 };
 
-export default ViewScoreContent;
+export default ViewScoresPage;
