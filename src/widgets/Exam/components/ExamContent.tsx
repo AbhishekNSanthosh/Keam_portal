@@ -166,7 +166,7 @@ export default function ExamContent({ handleLoading }: ExamContentProps) {
             </div>
           </div>
           <div className="flex-1 flex justify-end items-center gap-3">
-            <span>Hey, {session?.user.firstName+" "+session?.user.lastName}</span>
+          <span className="capitalize">Hey, {session?.user?.firstName}{" "}{session?.user.lastName}</span>
             <button
               onClick={handleSubmit}
               className="bg-red-600 px-3 py-2 rounded-md text-white font-semibold"

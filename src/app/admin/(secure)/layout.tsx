@@ -14,10 +14,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
   useEffect(() => {
     if (status === "loading") return; // If still loading, do nothing
-    // if (!session?.user.isAdmin && status === "authenticated") {
-    //   // Redirect non-admin users to the homepage or another page
-    //   router.push("/");
-    // }else 
+    if (!session?.user.isAdmin && status === "authenticated") {
+      // Redirect non-admin users to the homepage or another page
+      router.push("/");
+    }else 
     if (!session && status === "unauthenticated") {
       // If not authenticated, redirect to login
       router.push("/admin/login");
