@@ -1,4 +1,5 @@
 "use client";
+import customToast from "@components/CustomToast";
 import { signIn } from "next-auth/react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -12,18 +13,43 @@ export default function LoginContent() {
     e.preventDefault();
     const email = e.currentTarget.email.value;
     const dob = e.currentTarget.dob.value;
+    try {
+      const response = await signIn("credentials", {
+        email: email,
+        dob: dob,
+        redirect: false,
+      });
 
-    const response = await signIn("credentials", {
-      email: email,
-      dob: dob,
-      redirect: false,
-    });
-
-    if (response?.ok) {
-      alert("Login successful!");
-      router.push("/admin");
-    } else {
-      alert("Login failed. Please check your credentials.");
+      if (response?.ok) {
+        // Login successful
+        customToast({
+          message: "Login Successful",
+          desc: "Redirecting to Dashboard",
+          type: "success",
+          showIcon: true,
+        });
+        setTimeout(() => {
+          router.push("/admin"); // Navigate to exam page
+        }, 300);
+      } else {
+        // Handle errors from NextAuth response
+        const errorMessage = response?.error ? JSON.parse(response.error) : {};
+        customToast({
+          message: errorMessage.message || "Login Failed",
+          desc:
+            errorMessage.desc || "Please check your credentials and try again.",
+          type: "error",
+          showIcon: true,
+        });
+      }
+    } catch (error: any) {
+      // Catch unexpected errors
+      console.error("An unexpected error occurred:", error);
+      customToast({
+        message: "An unexpected error occurred. Please try again.",
+        type: "error",
+        showIcon: true,
+      });
     }
   };
 
