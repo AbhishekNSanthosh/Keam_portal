@@ -8,6 +8,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { HiUserAdd } from "react-icons/hi";
 import { FiLogOut } from "react-icons/fi";
 import { signOut } from "next-auth/react";
+import { BiSolidMessageSquareAdd } from "react-icons/bi";
 import customToast from "@components/CustomToast";
 
 export default function AdminSidebar() {
@@ -33,6 +34,11 @@ export default function AdminSidebar() {
       title: "View Score",
       link: "/admin/view-score",
       icon: <IoCheckmarkCircleSharp className="" />,
+    },
+    {
+      title: "Add Questions",
+      link: "/admin/add-question",
+      icon: <BiSolidMessageSquareAdd className="" />,
     },
   ];
   return (

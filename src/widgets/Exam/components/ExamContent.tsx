@@ -28,7 +28,7 @@ interface ExamContentProps {
 }
 
 export default function ExamContent({ handleLoading }: ExamContentProps) {
-  const [timer, setTimer] = useState(60); // Countdown timer
+  const [timer, setTimer] = useState(7200); // Initial timer set to 60 seconds
   const [questions, setQuestions] = useState<Question[]>([]);
   const [selectedAnswers, setSelectedAnswers] = useState<
     { _id: string; selectedValue: string }[]
@@ -38,18 +38,19 @@ export default function ExamContent({ handleLoading }: ExamContentProps) {
   const { data: session } = useSession();
   const [finished, setFinished] = useState(false);
   const router = useRouter();
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const [isUnsavedChanges, setIsUnsavedChanges] = useState(false);
 
   // Handle option selection
   const handleOptionChange = (_id: string, selectedValue: string) => {
+    setIsUnsavedChanges(true);
     setSelectedAnswers((prev) => {
       const updatedAnswers = [...prev];
       const index = updatedAnswers.findIndex((answer) => answer._id === _id);
 
       if (index !== -1) {
-        updatedAnswers[index].selectedValue = selectedValue; // Update existing
+        updatedAnswers[index].selectedValue = selectedValue;
       } else {
-        updatedAnswers.push({ _id, selectedValue }); // Add new
+        updatedAnswers.push({ _id, selectedValue });
       }
 
       return updatedAnswers;
@@ -95,7 +96,9 @@ export default function ExamContent({ handleLoading }: ExamContentProps) {
       setTimeout(() => {
         router.push("/success");
       }, 200);
-    } catch (error) {
+      console.log("API response:", result);
+      setIsUnsavedChanges(false);
+    } catch (error: any) {
       console.error("Error submitting answers:", error);
       customToast({
         message: "Failed to submit answers",
@@ -156,11 +159,27 @@ export default function ExamContent({ handleLoading }: ExamContentProps) {
     getQuestions();
   }, []);
 
+  useEffect(() => {
+    if (timer > 0 && !finished) {
+      const interval = setInterval(() => {
+        setTimer((prev) => prev - 1);
+      }, 1000);
+      return () => clearInterval(interval);
+    } else if (timer === 0 && !finished) {
+      setFinished(true);
+      handleSubmit(); // Automatically submit when timer reaches 0
+    }
+  }, [timer, finished]);
+
   if (typeof window !== "undefined") {
+    const unloadHandler = function () {
+      return "Your work will be lost.";
+    };
+
     if (!finished) {
-      window.onbeforeunload = function () {
-        return "Your work will be lost.";
-      };
+      window.onbeforeunload = unloadHandler;
+    } else {
+      window.onbeforeunload = null;
     }
   }
 
@@ -254,7 +273,15 @@ export default function ExamContent({ handleLoading }: ExamContentProps) {
 
         {/* Timer */}
         <div className="fixed bottom-5 right-5 bg-red-600 text-white font-bold text-lg px-4 py-2 rounded-lg shadow-lg">
-          Time Remaining: {timer}s
+          Time Remaining:{" "}
+          {Math.floor(timer / 3600)
+            .toString()
+            .padStart(2, "0")}
+          :
+          {Math.floor((timer % 3600) / 60)
+            .toString()
+            .padStart(2, "0")}
+          :{(timer % 60).toString().padStart(2, "0")}
         </div>
       </div>
     </main>

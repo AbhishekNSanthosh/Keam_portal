@@ -1,35 +1,39 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 
-const ViewScoresPage = () => {
-  const [students, setStudents] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+// Define the interface for a student
+interface Student {
+  _id: string;
+  firstName: string;
+  lastName: string;
+  score: number;
+}
 
-  // Fetch scores from the API
-  const fetchScores = async () => {
-    try {
-      const response = await fetch("/api/admin/scores", { method: "POST" });
+const ViewScoreContent = () => {
+  const [students, setStudents] = useState<Student[]>([]); // Array of Student objects
+  const [loading, setLoading] = useState<boolean>(true); // Boolean to track loading state
 
-      if (!response.ok) {
-        throw new Error("Failed to fetch scores.");
-      }
-
-      const data = await response.json();
-      if (data.success) {
-        setStudents(data.students);
-      } else {
-        throw new Error(data.message || "Failed to fetch data.");
-      }
-    } catch (err: any) {
-      setError(err.message || "An error occurred");
-    } finally {
-      setLoading(false);
-    }
-  };
-
+  // Fetch scores from the backend API
   useEffect(() => {
+    const fetchScores = async () => {
+      try {
+        const response = await fetch("/api/admin/view-score", {
+          method: "POST",
+        });
+        if (response.ok) {
+          const data: { data: Student[] } = await response.json(); // Type the API response
+          setStudents(data.data); // Update state with student data
+        } else {
+          console.error("Failed to fetch scores.");
+        }
+      } catch (err) {
+        console.error("Error fetching scores:", err);
+      } finally {
+        setLoading(false); // Hide loader
+      }
+    };
+
     fetchScores();
   }, []);
 
@@ -41,13 +45,11 @@ const ViewScoresPage = () => {
         </h1>
         {loading ? (
           <p className="text-center text-gray-600">Loading...</p>
-        ) : error ? (
-          <p className="text-center text-red-600">{error}</p>
         ) : students.length > 0 ? (
           <div className="space-y-4">
             {students.map((student, index) => (
               <div
-                key={student._id || index}
+                key={student._id || index.toString()}
                 className="p-4 border border-gray-200 rounded-lg hover:shadow-md transition"
               >
                 <p className="text-lg font-medium text-gray-700">
