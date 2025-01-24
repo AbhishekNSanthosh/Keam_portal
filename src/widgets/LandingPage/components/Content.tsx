@@ -1,7 +1,10 @@
 "use client"
+import customToast from "@components/CustomToast";
+import { useRouter } from "next/navigation";
 import React from "react";
 
 export default function Content() {
+  const router = useRouter();
   return (
     <div className="min-h-[100vh] pt-[100px] px-4 md:px-8 bg-gray-100 flex items-center justify-center">
       <div className="max-w-3xl mx-auto bg-white shadow-md rounded-lg p-6">
@@ -25,7 +28,16 @@ export default function Content() {
         <div className="mt-6 flex justify-center">
           <button
             className="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg transition duration-200"
-            onClick={() => alert("Exam Started")}
+            onClick={()=>{
+              router.replace('/exam');
+              setTimeout(() => {
+                customToast({
+                  message:"Exam started",
+                  // desc:"",
+                  type:"success"
+                })
+              }, 800);
+            }}
           >
             Start Exam
           </button>
