@@ -10,33 +10,34 @@ export default function LoginContent() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-  
+
     const email = e.currentTarget.email.value;
     const dob = e.currentTarget.dob.value;
-  
+
     try {
       const response = await signIn("credentials", {
         email: email,
         dob: dob,
-        redirect: false, // Ensures it won't redirect automatically
+        redirect: false,
       });
-      console.log(response)
       if (response?.ok) {
         // Login successful
         customToast({
           message: "Login Successful",
-          desc:"Redirecting to Dashboard",
+          desc: "Redirecting to Dashboard",
           type: "success",
           showIcon: true,
         });
-       setTimeout(() => {
-        router.push("/exam"); // Navigate to exam page
-       }, 300);
+        setTimeout(() => {
+          router.push("/exam"); // Navigate to exam page
+        }, 300);
       } else {
         // Handle errors from NextAuth response
         const errorMessage = response?.error ? JSON.parse(response.error) : {};
         customToast({
           message: errorMessage.message || "Login Failed",
+          desc:
+            errorMessage.desc || "Please check your credentials and try again.",
           type: "error",
           showIcon: true,
         });
@@ -50,7 +51,7 @@ export default function LoginContent() {
         showIcon: true,
       });
     }
-  };  
+  };
 
   return (
     <div className="px-6 md:px-[5vw] w-full min-h-screen flex flex-col items-center justify-center bg-gray-50">
