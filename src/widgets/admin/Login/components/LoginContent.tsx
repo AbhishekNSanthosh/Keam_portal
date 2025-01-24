@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React from "react";
 
+export const revalidate = 100;
 export default function LoginContent() {
   const router = useRouter();
 
@@ -20,7 +21,7 @@ export default function LoginContent() {
 
     if (response?.ok) {
       alert("Login successful!");
-      router.push("/admin/dashboard");
+      router.push("/admin");
     } else {
       alert("Login failed. Please check your credentials.");
     }
