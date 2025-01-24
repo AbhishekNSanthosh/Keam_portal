@@ -68,4 +68,4 @@ const ViewScoreContent = () => {
   );
 };
 
-export default ViewScoresPage;
+export default ViewScoreContent;

@@ -20,7 +20,11 @@ interface Question {
 
 interface ApiResponse {
   message: string;
-  data: Question[];
+  data: {
+    newQuestions: Question[];
+    remainingTime: number;
+    attemptedAnswers: { _id: string; selectedValue: string }[];
+  };
 }
 
 interface ExamContentProps {
@@ -28,11 +32,12 @@ interface ExamContentProps {
 }
 
 export default function ExamContent({ handleLoading }: ExamContentProps) {
-  const [timer, setTimer] = useState(7200); // Initial timer set to 60 seconds
+  const [timer, setTimer] = useState(7200); // Initial timer set to 2 hours
   const [questions, setQuestions] = useState<Question[]>([]);
   const [selectedAnswers, setSelectedAnswers] = useState<
     { _id: string; selectedValue: string }[]
   >([]);
+  const [noOfChanges, setNoOfChanges] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { data: session } = useSession();
@@ -40,7 +45,6 @@ export default function ExamContent({ handleLoading }: ExamContentProps) {
   const router = useRouter();
   const [isUnsavedChanges, setIsUnsavedChanges] = useState(false);
 
-  // Handle option selection
   const handleOptionChange = (_id: string, selectedValue: string) => {
     setIsUnsavedChanges(true);
     setSelectedAnswers((prev) => {
@@ -55,12 +59,50 @@ export default function ExamContent({ handleLoading }: ExamContentProps) {
 
       return updatedAnswers;
     });
+
+    setNoOfChanges((prev) => prev + 1);
+    if (!finished && isUnsavedChanges && noOfChanges >= 4) {
+      saveProgress();
+      setNoOfChanges(0);
+    }
   };
 
-  // Submit answers to the API
-  const saveAnswers = async () => {
+  const saveProgress = async () => {
+    console.log("Saving progress...");
     try {
-      const res = await fetch("/api/question/save", {
+      const res = await fetch("/api/exam/save-progress", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId: session?.user?.id,
+          questionsAttempted: selectedAnswers,
+          remainingTime: timer,
+        }),
+      });
+
+      if (!res.ok) {
+        throw new Error(`Failed to save progress: ${res.status}`);
+      }
+
+      const result = await res.json();
+      console.log("Progress saved:", result);
+      setIsUnsavedChanges(false);
+    } catch (error) {
+      console.error("Error saving progress:", error);
+      customToast({
+        message: "Failed to save progress",
+        type: "error",
+        showIcon: true,
+      });
+    }
+  };
+
+  const handleSubmit = async () => {
+    console.log("Submitting answers:", selectedAnswers);
+    try {
+      const res = await fetch("/api/exam/submit-answers", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -68,25 +110,14 @@ export default function ExamContent({ handleLoading }: ExamContentProps) {
         body: JSON.stringify({
           userId: session?.user?.id,
           answers: selectedAnswers,
-          timeRemaining: timer, // Include remaining time
         }),
       });
 
       if (!res.ok) {
-        throw new Error(`Failed to save answers: ${res.status}`);
+        throw new Error(`Failed to submit answers: ${res.status}`);
       }
 
       const result = await res.json();
-      console.log("Auto-save successful:", result);
-    } catch (error) {
-      console.error("Error saving answers:", error);
-    }
-  };
-
-  // Submit final answers
-  const handleSubmit = async () => {
-    try {
-      await saveAnswers(); // Save the latest answers before finishing
       customToast({
         message: "Finished",
         type: "success",
@@ -108,13 +139,15 @@ export default function ExamContent({ handleLoading }: ExamContentProps) {
     }
   };
 
-  // Fetch questions
   const getQuestions = async () => {
     handleLoading(true);
     try {
       const res = await fetch("/api/question/fetch", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId: session?.user?.id,
+        }),
       });
 
       if (!res.ok) {
@@ -122,8 +155,15 @@ export default function ExamContent({ handleLoading }: ExamContentProps) {
       }
 
       const data: ApiResponse = await res.json();
+
       if (data.message === "Data fetch successful") {
-        setQuestions(data.data);
+        const { remainingTime, attemptedAnswers, newQuestions } = data.data;
+        setQuestions(newQuestions);
+        setTimer(remainingTime);
+        setSelectedAnswers(attemptedAnswers);
+      } else {
+        console.error("Unexpected API response format:", data);
+        setQuestions([]); // Set fallback empty array
       }
     } catch (error: any) {
       console.error("Failed to fetch questions:", error);
@@ -134,30 +174,11 @@ export default function ExamContent({ handleLoading }: ExamContentProps) {
     }
   };
 
-  // Set up auto-save with random interval
   useEffect(() => {
-    const randomInterval = () => {
-      const interval = Math.floor(Math.random() * (10 - 5 + 1) + 5) * 60 * 1000; // Random interval between 5-10 minutes
-      console.log(`Next auto-save in ${interval / 60000} minutes`);
-      return interval;
-    };
-
-    const startAutoSave = () => {
-      intervalRef.current = setInterval(() => {
-        saveAnswers();
-      }, randomInterval());
-    };
-
-    startAutoSave();
-
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-    };
-  }, [selectedAnswers, timer]);
-
-  useEffect(() => {
-    getQuestions();
-  }, []);
+    if (session && loading) {
+      getQuestions();
+    }
+  }, [session]);
 
   useEffect(() => {
     if (timer > 0 && !finished) {
@@ -200,7 +221,7 @@ export default function ExamContent({ handleLoading }: ExamContentProps) {
             </div>
           </div>
           <div className="flex-1 flex justify-end items-center gap-3">
-            <span>Hey, {session?.user?.firstName || "User"}</span>
+            <span>Hey, Abhishek Santhosh</span>
             <button
               onClick={handleSubmit}
               className="bg-red-600 px-3 py-2 rounded-md text-white font-semibold"
@@ -223,43 +244,44 @@ export default function ExamContent({ handleLoading }: ExamContentProps) {
               handleSubmit();
             }}
           >
-            {questions.map((q, index) => (
-              <div key={q._id} className="mb-6">
-                <h2
-                  className="font-semibold text-gray-800 mb-2"
-                  dangerouslySetInnerHTML={{
-                    __html: `${index + 1}) ${q.question}`,
-                  }}
-                ></h2>
-                <div className="space-y-2">
-                  {["a", "b", "c", "d", "e"].map((optionKey) => {
-                    const optionValue = q[optionKey as keyof Question];
-                    return (
-                      optionValue && (
-                        <div key={optionKey} className="flex items-center">
-                          <input
-                            type="radio"
-                            id={`q${index}_o${optionKey}`}
-                            name={`q${index}`}
-                            value={optionValue}
-                            className="mr-2 w-5 h-5 text-red-600 border-2 border-gray-300 cursor-pointer"
-                            required
-                            onChange={(e) =>
-                              handleOptionChange(q._id, e.target.value)
-                            }
-                          />
-                          <label
-                            htmlFor={`q${index}_o${optionKey}`}
-                            className="text-gray-700"
-                            dangerouslySetInnerHTML={{ __html: optionValue }}
-                          ></label>
-                        </div>
-                      )
-                    );
-                  })}
+            {Array.isArray(questions) &&
+              questions.map((q, index) => (
+                <div key={q._id} className="mb-6">
+                  <h2
+                    className="font-semibold text-gray-800 mb-2"
+                    dangerouslySetInnerHTML={{
+                      __html: `${index + 1}) ${q.question}`,
+                    }}
+                  ></h2>
+                  <div className="space-y-2">
+                    {["a", "b", "c", "d", "e"].map((optionKey) => {
+                      const optionValue = q[optionKey as keyof Question];
+                      return (
+                        optionValue && (
+                          <div key={optionKey} className="flex items-center">
+                            <input
+                              type="radio"
+                              id={`q${index}_o${optionKey}`}
+                              name={`q${index}`}
+                              value={optionValue}
+                              className="mr-2 w-5 h-5 text-red-600 border-2 border-gray-300 cursor-pointer"
+                              required
+                              onChange={(e) =>
+                                handleOptionChange(q._id, e.target.value)
+                              }
+                            />
+                            <label
+                              htmlFor={`q${index}_o${optionKey}`}
+                              className="text-gray-700"
+                              dangerouslySetInnerHTML={{ __html: optionValue }}
+                            ></label>
+                          </div>
+                        )
+                      );
+                    })}
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
             <div className="mt-6 flex justify-center">
               <button
                 type="submit"

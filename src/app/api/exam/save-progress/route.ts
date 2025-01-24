@@ -6,7 +6,7 @@ export async function POST(req: Request) {
     try {
         // Parse the request body
         const { userId, questionsAttempted, remainingTime } = await req.json();
-
+        console.log(questionsAttempted)
         // Validate input
         if (!userId || !Array.isArray(questionsAttempted) || remainingTime === undefined) {
             return NextResponse.json(
@@ -18,14 +18,14 @@ export async function POST(req: Request) {
         // Connect to the database
         await connectToDB();
 
-        // Replace the entire `questionsAttempted` array and update remainingTime
+        // Update `questionsAttempted`, `isAttempted`, and `remainingTime`
         const updatedUser = await User.findByIdAndUpdate(
             userId,
             {
                 $set: {
                     questionsAttempted, // Replace with new array
-                    remainingTime, // Store the remaining time from the frontend
-                    isAttempted: true, // Set `isAttempted` based on array length
+                    isAttempted: questionsAttempted.length > 0, // Set `isAttempted` based on array length
+                    timeRemaining: remainingTime, // Update remaining time
                 },
             },
             { new: true } // Return the updated document
