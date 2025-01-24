@@ -4,11 +4,15 @@ import React from "react";
 import { MdSpaceDashboard } from "react-icons/md";
 import { IoCheckmarkCircleSharp } from "react-icons/io5";
 import { IoMdListBox } from "react-icons/io";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { HiUserAdd } from "react-icons/hi";
+import { FiLogOut } from "react-icons/fi";
+import { signOut } from "next-auth/react";
+import customToast from "@components/CustomToast";
 
 export default function AdminSidebar() {
   const location = usePathname();
+  const router = useRouter();
   const menuItems = [
     {
       title: "Dashboard",
@@ -55,6 +59,27 @@ export default function AdminSidebar() {
             <span className="text-[1.1rem]">{menuItem?.title}</span>
           </Link>
         ))}
+      </div>
+      <div className="absolute bottom-2 w-full px-[2vw]">
+        <button
+          onClick={() => {
+            signOut();
+            customToast({
+              message: "Logout Successful",
+              type: "success",
+              desc: "Redirecting to login page",
+              showIcon: true,
+            });
+            setTimeout(() => {
+              router.push("/admin/login");
+            }, 400);
+          }}
+          className="bg-red-100 flex items-center justify-center gap-2 py-2 font-semibold text-red-600 rounded-lg outline-none border-none w-full"
+        >
+          <FiLogOut className="text-xl" />
+          Logout
+        </button>
+        <span className=""></span>
       </div>
     </div>
   );
