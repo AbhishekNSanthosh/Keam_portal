@@ -6,7 +6,7 @@ import ExamHeader from './components/ExamHeader'
 export default function Exam() {
   return (
     <main>
-        <ExamHeader/>
+        {/* <ExamHeader/> */}
         <ExamContent/>
     </main>
   )
