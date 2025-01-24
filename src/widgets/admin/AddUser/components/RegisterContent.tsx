@@ -37,21 +37,11 @@ export default function RegisterContent() {
   };
 
   return (
-    <div className="p-6 md:px-[5vw] w-full min-h-screen flex flex-col items-center justify-center bg-gray-50">
-      <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-blue-700 uppercase">
-          A Glimpse to <span className="text-red-600">KEAM</span>
-        </h1>
-        <p className="text-gray-600 text-sm">Mock Test for KEAM Aspirants</p>
-      </div>
-      <div className="flex flex-col md:flex-row w-full max-w-6xl bg-white overflow-hidden p-2">
+    <div className="w-full flex flex-col items-center justify-center bg-gray-50">
+      <div className="flex flex-col md:flex-row w-full bg-white overflow-hidden p-2">
         {/* Left Section - Register Form */}
         <div className="flex-[0.9] p-8 md:p-12 shadow-sm rounded-lg">
-          <h2 className="text-4xl font-bold text-gray-800 mb-6">Register</h2>
-          <p className="text-gray-600 mb-8">
-            Please register to continue. Enter your details to create your
-            account.
-          </p>
+          <h3 className="text-4xl font-bold text-gray-800 mb-6">Create New User</h3>
           <form onSubmit={handleSubmit}>
             {/* First Name Field */}
             <div className="mb-6">
@@ -159,19 +149,6 @@ export default function RegisterContent() {
               Register
             </button>
           </form>
-        </div>
-
-        {/* Right Section - Illustration */}
-        <div className="hidden md:flex flex-[1.3] bg-blue-50 items-center justify-center p-8">
-          <div className="w-3/4">
-            <Image
-              src="/exam.svg"
-              alt="Illustration"
-              width={800}
-              height={800}
-              className="w-full h-auto object-contain"
-            />
-          </div>
         </div>
       </div>
     </div>
