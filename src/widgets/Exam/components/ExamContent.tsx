@@ -85,6 +85,13 @@ export default function ExamContent({ handleLoading }: ExamContentProps) {
       setTimeout(() => {
         router.push("/success");
       }, 200);
+      setTimeout(() => {
+        customToast({
+          message: "Logging out",
+          desc: "Redirecting to Login page",
+          type: "info",
+        });
+      }, 400);
       console.log("API response:", result);
       setIsUnsavedChanges(false); // Reset unsaved changes after submission
     } catch (error: any) {
@@ -127,12 +134,19 @@ export default function ExamContent({ handleLoading }: ExamContentProps) {
   }, []);
 
   if (typeof window !== "undefined") {
+    const unloadHandler = function () {
+      return "Your work will be lost.";
+    };
+  
+    // Add event listener if not finished
     if (!finished) {
-      window.onbeforeunload = function () {
-        return "Your work will be lost.";
-      };
+      window.onbeforeunload = unloadHandler;
+    } else {
+      // Remove event listener if finished
+      window.onbeforeunload = null; // Or use removeEventListener if needed
     }
   }
+  
 
   return (
     <main>
