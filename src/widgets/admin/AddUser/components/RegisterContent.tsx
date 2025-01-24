@@ -1,4 +1,5 @@
 "use client";
+import customToast from "@components/CustomToast";
 import Image from "next/image";
 import React, { useState } from "react";
 
@@ -24,15 +25,32 @@ export default function RegisterContent() {
       if (response.ok) {
         const data = await response.json();
         console.log("Success:", data);
-        alert("Registration successful!");
+        customToast({
+          message: "New user created",
+          type: "success",
+          showIcon: true,
+        });
+        setFirstName("")
+        setLastName("")
+        setMobile("")
+        setDob("")
+        setEmail("")
       } else {
         const error = await response.json();
         console.error("Error:", error);
-        alert("Registration failed. Please try again.");
+        customToast({
+          message: "Failed to create",
+          type: "error",
+          showIcon: true,
+        });
       }
     } catch (err) {
       console.error("Unexpected error:", err);
-      alert("An unexpected error occurred. Please try again later.");
+      customToast({
+        message: "Failed to create",
+        type: "error",
+        showIcon: true,
+      });
     }
   };
 
@@ -41,7 +59,9 @@ export default function RegisterContent() {
       <div className="flex flex-col md:flex-row w-full bg-white overflow-hidden p-2">
         {/* Left Section - Register Form */}
         <div className="flex-[0.9] p-8 md:p-12 shadow-sm rounded-lg">
-          <h3 className="text-4xl font-bold text-gray-800 mb-6">Create New User</h3>
+          <h3 className="text-xl font-bold text-red-600 mb-6">
+            Create New User
+          </h3>
           <form onSubmit={handleSubmit}>
             {/* First Name Field */}
             <div className="mb-6">

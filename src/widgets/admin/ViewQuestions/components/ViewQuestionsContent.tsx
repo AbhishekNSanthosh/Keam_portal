@@ -57,7 +57,7 @@ export default function ViewQuestionsContent() {
     getQuestions();
   }, []);
 
-  if (loading) return <div>Loading questions...</div>;
+  if (loading) return <div className="h-[82vh] w-full items-center justify-center flex bg-white">Loading questions...</div>;
   if (error) return <div>Error: {error}</div>;
 
   return (
