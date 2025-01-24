@@ -1,5 +1,6 @@
 import customToast from "@components/CustomToast";
 import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import React, { useState, useEffect } from "react";
 
 interface Question {
@@ -35,7 +36,8 @@ export default function ExamContent({ handleLoading }: ExamContentProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { data: session } = useSession();
-
+  const [finished, setFinished] = useState(false);
+  const router = useRouter();
   // Track if there are unsaved changes
   const [isUnsavedChanges, setIsUnsavedChanges] = useState(false);
 
@@ -75,19 +77,23 @@ export default function ExamContent({ handleLoading }: ExamContentProps) {
 
       const result = await res.json();
       customToast({
-        message:"Finished",
-        type:"success",
-        showIcon:true
-      })
+        message: "Finished",
+        type: "success",
+        showIcon: true,
+      });
+      setFinished(true);
+      setTimeout(() => {
+        router.push("/success");
+      }, 200);
       console.log("API response:", result);
       setIsUnsavedChanges(false); // Reset unsaved changes after submission
     } catch (error: any) {
       console.error("Error submitting answers:", error);
       customToast({
-        message:"Failed to submit answers",
-        type:"error",
-        showIcon:true
-      })
+        message: "Failed to submit answers",
+        type: "error",
+        showIcon: true,
+      });
     }
   };
 
@@ -120,7 +126,11 @@ export default function ExamContent({ handleLoading }: ExamContentProps) {
     getQuestions();
   }, []);
 
-  window.onbeforeunload = function() { return "Your work will be lost."; };
+  if (!finished) {
+    window.onbeforeunload = function () {
+      return "Your work will be lost.";
+    };
+  }
 
   return (
     <main>
