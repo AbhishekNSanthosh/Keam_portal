@@ -3,9 +3,10 @@ import customToast from "@components/CustomToast";
 import { signIn } from "next-auth/react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import React from "react";
+import React, { useState } from "react";
 
 export default function LoginContent() {
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -13,7 +14,7 @@ export default function LoginContent() {
 
     const email = e.currentTarget.email.value;
     const dob = e.currentTarget.dob.value;
-
+    setLoading(true);
     try {
       const response = await signIn("credentials", {
         email: email,
@@ -30,6 +31,7 @@ export default function LoginContent() {
         });
         setTimeout(() => {
           router.push("/"); // Navigate to exam page
+          setLoading(false);
         }, 300);
       } else {
         // Handle errors from NextAuth response
@@ -50,6 +52,8 @@ export default function LoginContent() {
         type: "error",
         showIcon: true,
       });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -104,10 +108,11 @@ export default function LoginContent() {
 
             {/* Submit Button */}
             <button
+              disabled={loading}
               type="submit"
               className="w-full bg-red-600 text-white py-3 rounded-lg hover:bg-blue-700 transition duration-300"
             >
-              Login
+             {loading ? "Please wait..." : "Login"}
             </button>
           </form>
         </div>
