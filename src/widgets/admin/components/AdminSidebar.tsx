@@ -2,6 +2,7 @@
 import Link from "next/link";
 import React from "react";
 import { MdSpaceDashboard } from "react-icons/md";
+import { IoCheckmarkCircleSharp } from "react-icons/io5";
 import { IoMdListBox } from "react-icons/io";
 import { usePathname } from "next/navigation";
 import { HiUserAdd } from "react-icons/hi";
@@ -20,10 +21,15 @@ export default function AdminSidebar() {
       icon: <IoMdListBox className="" />,
     },
     {
-        title: "Add Users",
-        link: "/admin/add-users",
-        icon: <HiUserAdd className="" />,
-      },
+      title: "Add Users",
+      link: "/admin/add-users",
+      icon: <HiUserAdd className="" />,
+    },
+    {
+      title: "View Score",
+      link: "/admin/view-score",
+      icon: <IoCheckmarkCircleSharp className="" />,
+    },
   ];
   return (
     <div className="w-[18vw] h-screen pt-[2rem] fixed bg-white">
