@@ -1,4 +1,3 @@
-"use client";
 import { useSession } from "next-auth/react";
 import React, { useState, useEffect } from "react";
 
@@ -22,7 +21,11 @@ interface ApiResponse {
   data: Question[];
 }
 
-export default function ExamContent() {
+interface ExamContentProps {
+  handleLoading: (data: boolean) => void;
+}
+
+export default function ExamContent({ handleLoading }: ExamContentProps) {
   const [timer, setTimer] = useState(60);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [selectedAnswers, setSelectedAnswers] = useState<
@@ -32,7 +35,11 @@ export default function ExamContent() {
   const [error, setError] = useState<string | null>(null);
   const { data: session } = useSession();
 
+  // Track if there are unsaved changes
+  const [isUnsavedChanges, setIsUnsavedChanges] = useState(false);
+
   const handleOptionChange = (_id: string, selectedValue: string) => {
+    setIsUnsavedChanges(true); // Mark as unsaved when any change is made
     setSelectedAnswers((prev) => {
       const updatedAnswers = [...prev];
       const index = updatedAnswers.findIndex((answer) => answer._id === _id);
@@ -49,7 +56,6 @@ export default function ExamContent() {
 
   const handleSubmit = async () => {
     console.log("Submitting answers:", selectedAnswers);
-
     try {
       const res = await fetch("/api/exam/submit-answers", {
         method: "POST",
@@ -69,6 +75,7 @@ export default function ExamContent() {
       const result = await res.json();
       alert("Submission successful!");
       console.log("API response:", result);
+      setIsUnsavedChanges(false); // Reset unsaved changes after submission
     } catch (error: any) {
       console.error("Error submitting answers:", error);
       alert("Failed to submit answers. Please try again.");
@@ -76,6 +83,7 @@ export default function ExamContent() {
   };
 
   const getQuestions = async () => {
+    handleLoading(true);
     try {
       const res = await fetch("/api/question/fetch", {
         method: "POST",
@@ -95,12 +103,28 @@ export default function ExamContent() {
       setError(error.message || "An unexpected error occurred.");
     } finally {
       setLoading(false);
+      handleLoading(false);
     }
   };
 
   useEffect(() => {
     getQuestions();
-  }, []);
+
+    // Handle beforeunload event
+    const beforeUnloadHandler = (event: BeforeUnloadEvent) => {
+      if (isUnsavedChanges) {
+        const message = "You have unsaved changes. Are you sure you want to leave?";
+        event.returnValue = message; // Standard for most browsers
+        return message; // For some browsers like Chrome
+      }
+    };
+
+    window.addEventListener("beforeunload", beforeUnloadHandler);
+
+    return () => {
+      window.removeEventListener("beforeunload", beforeUnloadHandler);
+    };
+  }, [isUnsavedChanges]);
 
   return (
     <main>
@@ -113,7 +137,9 @@ export default function ExamContent() {
                 A Glimpse To KEAM
               </span>
               <br />
-              <span className="text-xs font-normal">Mock test for KEAM Aspirants</span>
+              <span className="text-xs font-normal">
+                Mock test for KEAM Aspirants
+              </span>
             </div>
           </div>
           <div className="flex-1 flex justify-end items-center gap-3">
@@ -144,7 +170,9 @@ export default function ExamContent() {
               <div key={q._id} className="mb-6">
                 <h2
                   className="font-semibold text-gray-800 mb-2"
-                  dangerouslySetInnerHTML={{ __html: `${index + 1}) ${q.question}` }}
+                  dangerouslySetInnerHTML={{
+                    __html: `${index + 1}) ${q.question}`,
+                  }}
                 ></h2>
                 <div className="space-y-2">
                   {["a", "b", "c", "d", "e"].map((optionKey) => {

@@ -29,7 +29,7 @@ export default function Content() {
           <button
             className="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg transition duration-200"
             onClick={()=>{
-              router.push('/exam');
+              router.replace('/exam');
               setTimeout(() => {
                 customToast({
                   message:"Exam started",
