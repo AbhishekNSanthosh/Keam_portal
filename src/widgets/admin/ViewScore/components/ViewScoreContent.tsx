@@ -52,7 +52,7 @@ const ViewScoreContent = () => {
                 key={student._id || index.toString()}
                 className="p-4 border border-gray-200 rounded-lg hover:shadow-md transition"
               >
-                <p className="text-lg font-medium text-gray-700">
+                <p className="text-lg font-medium text-gray-700 capitalize">
                   <strong>Rank {index + 1}:</strong> {student.firstName}{" "}
                   {student.lastName}
                 </p>
