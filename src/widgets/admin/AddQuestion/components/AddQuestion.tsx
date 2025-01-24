@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useRef, useMemo } from "react";
 import JoditEditor from "jodit-react";
+import customToast from "@components/CustomToast";
 
 interface UploadProps {
   placeholder?: string;
@@ -50,6 +51,43 @@ export default function Upload({ placeholder }: UploadProps): JSX.Element {
   };
 
   console.log(data);
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    try {
+      const response = await fetch("/api/admin/question/add-question", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        customToast({
+          message: "Question added",
+          showIcon: true,
+          type: "success",
+        });
+        setData({
+          question: "",
+          a: "",
+          b: "",
+          c: "",
+          d: "",
+          e: "",
+          correct: "",
+        });
+      } else {
+        alert("Failed to add question: " + result.message);
+      }
+    } catch (err) {
+      console.error(err);
+      alert("An error occurred while adding the question.");
+    }
+  };
 
   return (
     <div className="w-full bg-white">
@@ -80,15 +118,20 @@ export default function Upload({ placeholder }: UploadProps): JSX.Element {
               <div className="flex flex-row items-center">
                 <span className="">Content :</span>
                 <div
-                className="text-sm text-gray-800"
-                dangerouslySetInnerHTML={{
-                  __html: data[key as keyof QuestionData],
-                }}
-              />
+                  className="text-sm text-gray-800"
+                  dangerouslySetInnerHTML={{
+                    __html: data[key as keyof QuestionData],
+                  }}
+                />
               </div>
             </div>
           ))}
-          <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+          <button
+            onClick={(e) => {
+              handleSubmit(e);
+            }}
+            className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+          >
             Add Question
           </button>
         </div>
