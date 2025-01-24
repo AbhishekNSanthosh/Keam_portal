@@ -29,7 +29,7 @@ export default function LoginContent() {
           showIcon: true,
         });
         setTimeout(() => {
-          router.push("/exam"); // Navigate to exam page
+          router.push("/"); // Navigate to exam page
         }, 300);
       } else {
         // Handle errors from NextAuth response
