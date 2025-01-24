@@ -1,3 +1,4 @@
+import Image from "next/image";
 import React from "react";
 
 export default function Header() {
@@ -13,7 +14,9 @@ export default function Header() {
       </div>
       <div className="flex-1 flex flex-row items-center justify-end gap-3">
        <span className=""> Hey, Abhishek Santhosh</span>
-       <span className=""> Profile</span>
+       <div className="rounded-full">
+        <Image src={'/profile.jpg'} width={200} height={200} className="h-[30px] w-[40px] rounded-full object-contain" alt=""/>
+       </div>
       </div>
     </div>
   );
