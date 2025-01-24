@@ -4,19 +4,31 @@ let isConnected = false;
 
 export const connectToDB = async () => {
   mongoose.set("strictQuery", true);
+  
   if (isConnected) {
     console.log("==> Mongo Already connected");
     return;
   }
 
   try {
-    await mongoose.connect(process.env.MANGODB_URL!, {
-      dbName: "keamportal",
-      writeConcern: { w: 'majority' },
+    // Ensure the environment variable name is correct
+    const mongoURI = process.env.MONGODB_URL;  // Update to the correct env variable
+    
+    if (!mongoURI) {
+      throw new Error("MongoDB URI is not defined in the environment variables.");
+    }
+
+    await mongoose.connect(mongoURI, {
+      dbName: "keamportal", // Database name
+      writeConcern: { w: 'majority' }, // Ensure data consistency
     });
+
     isConnected = true;
     console.log("==> Mongo Successfully connected");
+
   } catch (error) {
-    console.log('Connection error:', error);
+    console.error('Connection error:', error);
+    // You can throw an error if you want to stop the process in case of a connection issue
+    // throw error;
   }
 };
