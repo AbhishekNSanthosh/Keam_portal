@@ -109,22 +109,9 @@ export default function ExamContent({ handleLoading }: ExamContentProps) {
 
   useEffect(() => {
     getQuestions();
+  }, []);
 
-    // Handle beforeunload event
-    const beforeUnloadHandler = (event: BeforeUnloadEvent) => {
-      if (isUnsavedChanges) {
-        const message = "You have unsaved changes. Are you sure you want to leave?";
-        event.returnValue = message; // Standard for most browsers
-        return message; // For some browsers like Chrome
-      }
-    };
-
-    window.addEventListener("beforeunload", beforeUnloadHandler);
-
-    return () => {
-      window.removeEventListener("beforeunload", beforeUnloadHandler);
-    };
-  }, [isUnsavedChanges]);
+  window.onbeforeunload = function() { return "Your work will be lost."; };
 
   return (
     <main>
