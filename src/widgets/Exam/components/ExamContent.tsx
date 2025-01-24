@@ -1,7 +1,7 @@
 import customToast from "@components/CustomToast";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 
 interface Question {
   _id: string;
@@ -28,7 +28,7 @@ interface ExamContentProps {
 }
 
 export default function ExamContent({ handleLoading }: ExamContentProps) {
-  const [timer, setTimer] = useState(60);
+  const [timer, setTimer] = useState(60); // Countdown timer
   const [questions, setQuestions] = useState<Question[]>([]);
   const [selectedAnswers, setSelectedAnswers] = useState<
     { _id: string; selectedValue: string }[]
@@ -38,11 +38,10 @@ export default function ExamContent({ handleLoading }: ExamContentProps) {
   const { data: session } = useSession();
   const [finished, setFinished] = useState(false);
   const router = useRouter();
-  // Track if there are unsaved changes
-  const [isUnsavedChanges, setIsUnsavedChanges] = useState(false);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
+  // Handle option selection
   const handleOptionChange = (_id: string, selectedValue: string) => {
-    setIsUnsavedChanges(true); // Mark as unsaved when any change is made
     setSelectedAnswers((prev) => {
       const updatedAnswers = [...prev];
       const index = updatedAnswers.findIndex((answer) => answer._id === _id);
@@ -57,10 +56,10 @@ export default function ExamContent({ handleLoading }: ExamContentProps) {
     });
   };
 
-  const handleSubmit = async () => {
-    console.log("Submitting answers:", selectedAnswers);
+  // Submit answers to the API
+  const saveAnswers = async () => {
     try {
-      const res = await fetch("/api/exam/submit-answers", {
+      const res = await fetch("/api/question/save", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -68,14 +67,25 @@ export default function ExamContent({ handleLoading }: ExamContentProps) {
         body: JSON.stringify({
           userId: session?.user?.id,
           answers: selectedAnswers,
+          timeRemaining: timer, // Include remaining time
         }),
       });
 
       if (!res.ok) {
-        throw new Error(`Failed to submit answers: ${res.status}`);
+        throw new Error(`Failed to save answers: ${res.status}`);
       }
 
       const result = await res.json();
+      console.log("Auto-save successful:", result);
+    } catch (error) {
+      console.error("Error saving answers:", error);
+    }
+  };
+
+  // Submit final answers
+  const handleSubmit = async () => {
+    try {
+      await saveAnswers(); // Save the latest answers before finishing
       customToast({
         message: "Finished",
         type: "success",
@@ -85,9 +95,7 @@ export default function ExamContent({ handleLoading }: ExamContentProps) {
       setTimeout(() => {
         router.push("/success");
       }, 200);
-      console.log("API response:", result);
-      setIsUnsavedChanges(false); // Reset unsaved changes after submission
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error submitting answers:", error);
       customToast({
         message: "Failed to submit answers",
@@ -97,6 +105,7 @@ export default function ExamContent({ handleLoading }: ExamContentProps) {
     }
   };
 
+  // Fetch questions
   const getQuestions = async () => {
     handleLoading(true);
     try {
@@ -121,6 +130,27 @@ export default function ExamContent({ handleLoading }: ExamContentProps) {
       handleLoading(false);
     }
   };
+
+  // Set up auto-save with random interval
+  useEffect(() => {
+    const randomInterval = () => {
+      const interval = Math.floor(Math.random() * (10 - 5 + 1) + 5) * 60 * 1000; // Random interval between 5-10 minutes
+      console.log(`Next auto-save in ${interval / 60000} minutes`);
+      return interval;
+    };
+
+    const startAutoSave = () => {
+      intervalRef.current = setInterval(() => {
+        saveAnswers();
+      }, randomInterval());
+    };
+
+    startAutoSave();
+
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
+  }, [selectedAnswers, timer]);
 
   useEffect(() => {
     getQuestions();
@@ -151,7 +181,7 @@ export default function ExamContent({ handleLoading }: ExamContentProps) {
             </div>
           </div>
           <div className="flex-1 flex justify-end items-center gap-3">
-            <span>Hey, Abhishek Santhosh</span>
+            <span>Hey, {session?.user?.firstName || "User"}</span>
             <button
               onClick={handleSubmit}
               className="bg-red-600 px-3 py-2 rounded-md text-white font-semibold"
