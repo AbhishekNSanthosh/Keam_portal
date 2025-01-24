@@ -1,7 +1,7 @@
 import { connectToDB } from "@utils/database";
 import User from "@models/User";
 
-export const revalidate = 300;
+export const fetchCache = "no-store";
 
 const ViewUserContent = async () => {
   // Connect to the database
