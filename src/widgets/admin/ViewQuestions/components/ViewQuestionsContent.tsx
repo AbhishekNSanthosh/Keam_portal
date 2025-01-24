@@ -30,7 +30,7 @@ export default function ViewQuestionsContent() {
   const getQuestions = async () => {
     try {
       setLoading(true); // Start loading
-      const res = await fetch("/api/question/fetch", {
+      const res = await fetch("/api/admin/question/fetch", {
         method: "POST", // Use GET for fetching data
         headers: {
           "Content-Type": "application/json",
