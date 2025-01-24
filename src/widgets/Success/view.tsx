@@ -1,13 +1,21 @@
-"use client"
+"use client";
 import Header from "@widgets/Header";
-import { signOut } from "next-auth/react";
+import { stat } from "fs";
+import { signOut, useSession } from "next-auth/react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import React, { useEffect } from "react";
 
 export default function Success() {
+  const router = useRouter();
+  const { data: session, status } = useSession();
   useEffect(() => {
+    if (status === "unauthenticated") {
+      router.push("/login");
+    }
     setTimeout(() => {
       signOut();
+      router.push('/login')
     }, 1000);
   }, []);
   return (
