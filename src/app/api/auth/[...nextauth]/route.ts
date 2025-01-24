@@ -53,7 +53,7 @@ const handler = NextAuth({
             throw new Error(
               JSON.stringify({
                 message: "Invalid Credentials",
-                desc: "Email or date of birth is incorrect. Please try again.",
+                desc: "Please try again.",
               })
             );
           }
