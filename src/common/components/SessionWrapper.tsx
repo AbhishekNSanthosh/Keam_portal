@@ -18,27 +18,34 @@ const SessionWrapper = ({
   const router = useRouter();
 
   useEffect(() => {
-    const handleRedirect = async () => {
+    const handleRedirect = () => {
       if (status === "loading") {
-        return;
+        return; // Do nothing while loading
       }
-      if (session) {
+
+      if (status === "unauthenticated") {
+        return null;
+      } else if (session) {
         // User is authenticated
         if (admin && !session.user.isAdmin) {
           // If admin access is required but user is not an admin
           router.push("/login");
-        } else if (session.user.isAdmin && pathname === "/admin/login") {
-          router.push("/admin"); // Redirect to admin dashboard or another appropriate page
+        } else if (admin && session.user.isAdmin) {
+          // Admin user can access /admin paths
+          if (!pathname.startsWith("/admin")) {
+            router.push("/admin"); // Redirect to admin dashboard if trying to access non-admin path
+          }
+        } else if (!admin && pathname.startsWith("/admin")) {
+          // Non-admin user trying to access /admin path
+          router.push("/"); // Redirect to home or another appropriate page
         }
-      } else if (status === "unauthenticated" && !session) {
-        // router.push("/login");
       }
     };
 
     handleRedirect();
   }, [status, session, admin, router, pathname]);
 
-  if (status === "loading" || status === "unauthenticated") {
+  if (status === "loading") {
     return <div>Loading...</div>; // Show loading state
   }
 

@@ -1,6 +1,8 @@
 import { connectToDB } from "@utils/database";
 import User from "@models/User";
 
+export const revalidate = 300;
+
 const ViewUserContent = async () => {
   // Connect to the database
   await connectToDB();
