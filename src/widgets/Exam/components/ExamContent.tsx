@@ -126,10 +126,12 @@ export default function ExamContent({ handleLoading }: ExamContentProps) {
     getQuestions();
   }, []);
 
-  if (!finished) {
-    window.onbeforeunload = function () {
-      return "Your work will be lost.";
-    };
+  if (typeof window !== "undefined") {
+    if (!finished) {
+      window.onbeforeunload = function () {
+        return "Your work will be lost.";
+      };
+    }
   }
 
   return (
