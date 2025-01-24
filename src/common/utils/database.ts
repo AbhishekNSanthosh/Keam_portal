@@ -12,7 +12,7 @@ export const connectToDB = async () => {
 
   try {
     // Ensure the environment variable name is correct
-    const mongoURI = process.env.MONGODB_URL;  // Update to the correct env variable
+    const mongoURI = process.env.MANGODB_URL;  // Update to the correct env variable
     
     if (!mongoURI) {
       throw new Error("MongoDB URI is not defined in the environment variables.");
