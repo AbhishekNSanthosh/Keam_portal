@@ -44,9 +44,9 @@ export default function AdminSidebar() {
   return (
     <div className="w-[18vw] h-screen pt-[2rem] fixed bg-white">
       <div className="flex flex-col justify-center items-center px-[2vw] text-gray-700">
-        <span className="text-base font-semibold">A Glimpse To KEAM</span>
+        <span className="text-base font-semibold">A Glimpse To <span className="text-red-600">KEAM</span></span>
         <span className="text-xs font-normal">
-          Mock test for KEAM Aspirants
+          Mock test for <span className="text-red-600">KEAM</span> Aspirants
         </span>
       </div>
       <div className="mt-[8vh] w-full flex flex-col gap-1">

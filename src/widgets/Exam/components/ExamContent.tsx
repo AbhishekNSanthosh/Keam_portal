@@ -46,7 +46,6 @@ export default function ExamContent({ handleLoading }: ExamContentProps) {
   const [isUnsavedChanges, setIsUnsavedChanges] = useState(false);
 
   const handleOptionChange = (_id: string, selectedValue: string) => {
-    setIsUnsavedChanges(true);
     setSelectedAnswers((prev) => {
       const updatedAnswers = [...prev];
       const index = updatedAnswers.findIndex((answer) => answer._id === _id);
@@ -62,42 +61,44 @@ export default function ExamContent({ handleLoading }: ExamContentProps) {
 
     setNoOfChanges((prev) => prev + 1);
     if (!finished && isUnsavedChanges && noOfChanges >= 4) {
-      saveProgress();
+      // saveProgress();
       setNoOfChanges(0);
     }
   };
 
-  const saveProgress = async () => {
-    console.log("Saving progress...");
-    try {
-      const res = await fetch("/api/exam/save-progress", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          userId: session?.user?.id,
-          questionsAttempted: selectedAnswers,
-          remainingTime: timer,
-        }),
-      });
+  console.log(selectedAnswers)
 
-      if (!res.ok) {
-        throw new Error(`Failed to save progress: ${res.status}`);
-      }
+  // const saveProgress = async () => {
+  //   console.log("Saving progress...");
+  //   try {
+  //     const res = await fetch("/api/exam/save-progress", {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify({
+  //         userId: session?.user?.id,
+  //         questionsAttempted: selectedAnswers,
+  //         remainingTime: timer,
+  //       }),
+  //     });
 
-      const result = await res.json();
-      console.log("Progress saved:", result);
-      setIsUnsavedChanges(false);
-    } catch (error) {
-      console.error("Error saving progress:", error);
-      customToast({
-        message: "Failed to save progress",
-        type: "error",
-        showIcon: true,
-      });
-    }
-  };
+  //     if (!res.ok) {
+  //       throw new Error(`Failed to save progress: ${res.status}`);
+  //     }
+
+  //     const result = await res.json();
+  //     console.log("Progress saved:", result);
+  //     setIsUnsavedChanges(false);
+  //   } catch (error) {
+  //     console.error("Error saving progress:", error);
+  //     customToast({
+  //       message: "Failed to save progress",
+  //       type: "error",
+  //       showIcon: true,
+  //     });
+  //   }
+  // };
 
   const handleSubmit = async () => {
     console.log("Submitting answers:", selectedAnswers);
@@ -282,14 +283,14 @@ export default function ExamContent({ handleLoading }: ExamContentProps) {
                   </div>
                 </div>
               ))}
-            <div className="mt-6 flex justify-center">
+            {/* <div className="mt-6 flex justify-center">
               <button
                 type="submit"
                 className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg"
               >
                 Submit
               </button>
-            </div>
+            </div> */}
           </form>
         </div>
 

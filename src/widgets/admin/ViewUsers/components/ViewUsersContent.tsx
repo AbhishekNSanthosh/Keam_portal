@@ -85,4 +85,4 @@ const ViewUserContent = () => {
   );
 };
 
-export default ViewStudentsPage;
+export default ViewUserContent;
