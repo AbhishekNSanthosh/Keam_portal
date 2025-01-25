@@ -1,7 +1,7 @@
 import customToast from "@components/CustomToast";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 
 interface Question {
   _id: string;
@@ -37,71 +37,26 @@ export default function ExamContent({ handleLoading }: ExamContentProps) {
   const [selectedAnswers, setSelectedAnswers] = useState<
     { _id: string; selectedValue: string }[]
   >([]);
-  const [noOfChanges, setNoOfChanges] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const { data: session } = useSession();
   const [finished, setFinished] = useState(false);
+  const { data: session } = useSession();
   const router = useRouter();
-  const [isUnsavedChanges, setIsUnsavedChanges] = useState(false);
 
+  // Handle option selection
   const handleOptionChange = (_id: string, selectedValue: string) => {
     setSelectedAnswers((prev) => {
-      const updatedAnswers = [...prev];
-      const index = updatedAnswers.findIndex((answer) => answer._id === _id);
-
-      if (index !== -1) {
-        updatedAnswers[index].selectedValue = selectedValue;
-      } else {
-        updatedAnswers.push({ _id, selectedValue });
-      }
-
-      return updatedAnswers;
+      const updatedAnswers = prev.filter((answer) => answer._id !== _id);
+      return [...updatedAnswers, { _id, selectedValue }];
     });
-
-    setNoOfChanges((prev) => prev + 1);
-    if (!finished && isUnsavedChanges && noOfChanges >= 4) {
-      // saveProgress();
-      setNoOfChanges(0);
-    }
   };
 
-  console.log(selectedAnswers)
+  // Clear selection for a specific question
+  const clearSelection = (_id: string) => {
+    setSelectedAnswers((prev) => prev.filter((answer) => answer._id !== _id));
+  };
 
-  // const saveProgress = async () => {
-  //   console.log("Saving progress...");
-  //   try {
-  //     const res = await fetch("/api/exam/save-progress", {
-  //       method: "POST",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //       body: JSON.stringify({
-  //         userId: session?.user?.id,
-  //         questionsAttempted: selectedAnswers,
-  //         remainingTime: timer,
-  //       }),
-  //     });
-
-  //     if (!res.ok) {
-  //       throw new Error(`Failed to save progress: ${res.status}`);
-  //     }
-
-  //     const result = await res.json();
-  //     console.log("Progress saved:", result);
-  //     setIsUnsavedChanges(false);
-  //   } catch (error) {
-  //     console.error("Error saving progress:", error);
-  //     customToast({
-  //       message: "Failed to save progress",
-  //       type: "error",
-  //       showIcon: true,
-  //     });
-  //   }
-  // };
-
+  // Submit answers to API
   const handleSubmit = async () => {
-    console.log("Submitting answers:", selectedAnswers);
     try {
       const res = await fetch("/api/exam/submit-answers", {
         method: "POST",
@@ -114,115 +69,87 @@ export default function ExamContent({ handleLoading }: ExamContentProps) {
         }),
       });
 
-      if (!res.ok) {
-        throw new Error(`Failed to submit answers: ${res.status}`);
-      }
+      if (!res.ok) throw new Error("Failed to submit answers");
 
       const result = await res.json();
-      customToast({
-        message: "Finished",
-        type: "success",
-        showIcon: true,
-      });
+      customToast({ message: "Exam Finished!", type: "success", showIcon: true });
       setFinished(true);
-      setTimeout(() => {
-        router.push("/success");
-      }, 200);
-      console.log("API response:", result);
-      setIsUnsavedChanges(false);
-    } catch (error: any) {
-      console.error("Error submitting answers:", error);
-      customToast({
-        message: "Failed to submit answers",
-        type: "error",
-        showIcon: true,
-      });
+      router.push("/success");
+    } catch (error) {
+      customToast({ message: "Failed to submit answers", type: "error", showIcon: true });
     }
   };
 
+  // Fetch questions from API
   const getQuestions = async () => {
     handleLoading(true);
     try {
       const res = await fetch("/api/question/fetch", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          userId: session?.user?.id,
-        }),
+        body: JSON.stringify({ userId: session?.user?.id }),
       });
 
-      if (!res.ok) {
-        throw new Error(`Error: ${res.status} ${res.statusText}`);
-      }
+      if (!res.ok) throw new Error("Failed to fetch questions");
 
       const data: ApiResponse = await res.json();
-
-      if (data.message === "Data fetch successful") {
-        const { remainingTime, attemptedAnswers, newQuestions } = data.data;
-        setQuestions(newQuestions);
-        setTimer(remainingTime);
-        setSelectedAnswers(attemptedAnswers);
-      } else {
-        console.error("Unexpected API response format:", data);
-        setQuestions([]); // Set fallback empty array
-      }
-    } catch (error: any) {
-      console.error("Failed to fetch questions:", error);
-      setError(error.message || "An unexpected error occurred.");
+      const { remainingTime, attemptedAnswers, newQuestions } = data.data;
+      setQuestions(newQuestions);
+      setTimer(remainingTime);
+      setSelectedAnswers(attemptedAnswers);
+    } catch (error) {
+      console.error("Error fetching questions:", error);
     } finally {
       setLoading(false);
       handleLoading(false);
     }
   };
 
-  useEffect(() => {
-    if (session && loading) {
-      getQuestions();
-    }
-  }, [session]);
-
+  // Timer countdown
   useEffect(() => {
     if (timer > 0 && !finished) {
-      const interval = setInterval(() => {
-        setTimer((prev) => prev - 1);
-      }, 1000);
+      const interval = setInterval(() => setTimer((prev) => prev - 1), 1000);
       return () => clearInterval(interval);
     } else if (timer === 0 && !finished) {
-      setFinished(true);
-      handleSubmit(); // Automatically submit when timer reaches 0
+      handleSubmit();
     }
   }, [timer, finished]);
 
-  if (typeof window !== "undefined") {
-    const unloadHandler = function () {
-      return "Your work will be lost.";
+  // Fetch questions on session load
+  useEffect(() => {
+    if (session) getQuestions();
+  }, [session]);
+
+  // Warn user about unsaved changes on page unload
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (!finished) {
+        e.preventDefault();
+        e.returnValue = "Your progress will be lost!";
+      }
     };
 
-    if (!finished) {
-      window.onbeforeunload = unloadHandler;
-    } else {
-      window.onbeforeunload = null;
-    }
-  }
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [finished]);
 
   return (
     <main>
       {/* Header Section */}
-      <div className=" bg-gray-100 fixed w-full z-10">
+      <div className="bg-gray-100 fixed w-full z-10">
         <div className="bg-white flex flex-row px-[3vw] py-[1vw] rounded-lg">
           <div className="flex-1 flex items-center">
             <div className="text-center">
-              <span className="text-xl font-semibold text-gray-700">
-                A Glimpse To KEAM
-              </span>
+              <span className="text-xl font-semibold text-gray-700">A Glimpse To KEAM</span>
               <br />
-              <span className="text-xs font-normal">
-                Mock test for KEAM Aspirants
-              </span>
+              <span className="text-xs font-normal">Mock test for KEAM Aspirants</span>
             </div>
+            {selectedAnswers?.length !== 0 && <span className="ml-10 font-semibold text-gray-700">Attempted: {selectedAnswers?.length}/100</span>}
           </div>
           <div className="flex-1 flex justify-end items-center gap-3">
-          <span className="capitalize text-xl font-semibold text-red-600">Hey, {session?.user?.firstName}{" "}{session?.user.lastName}👋</span>
+            <span className="capitalize text-xl font-semibold text-red-600">
+              Hey, {session?.user?.firstName} {session?.user?.lastName} 👋
+            </span>
             <button
               onClick={handleSubmit}
               className="bg-red-600 px-3 py-2 rounded-md text-white font-semibold"
@@ -236,75 +163,60 @@ export default function ExamContent({ handleLoading }: ExamContentProps) {
       {/* Content Section */}
       <div className="min-h-[100vh] pt-[100px] px-4 bg-gray-100">
         <div className="max-w-4xl mx-auto bg-white shadow-lg rounded-lg p-6">
-          <div className="flex justify-between items-center mb-6">
-            <h1 className="text-xl font-bold text-gray-800">KEAM MOCK TEST</h1>
-          </div>
+          <h1 className="text-xl font-bold text-gray-800 mb-6">KEAM MOCK TEST</h1>
           <form
             onSubmit={(e) => {
               e.preventDefault();
               handleSubmit();
             }}
           >
-            {Array.isArray(questions) &&
-              questions.map((q, index) => (
-                <div key={q._id} className="mb-6">
-                  <h2
-                    className="font-semibold text-gray-800 mb-2"
-                    dangerouslySetInnerHTML={{
-                      __html: `${index + 1}) ${q.question}`,
-                    }}
-                  ></h2>
-                  <div className="space-y-2">
-                    {["a", "b", "c", "d", "e"].map((optionKey) => {
-                      const optionValue = q[optionKey as keyof Question];
-                      return (
-                        optionValue && (
-                          <div key={optionKey} className="flex items-center">
-                            <input
-                              type="radio"
-                              id={`q${index}_o${optionKey}`}
-                              name={`q${index}`}
-                              value={optionValue}
-                              className="mr-2 w-5 h-5 text-red-600 border-2 border-gray-300 cursor-pointer"
-                              required
-                              onChange={(e) =>
-                                handleOptionChange(q._id, e.target.value)
-                              }
-                            />
-                            <label
-                              htmlFor={`q${index}_o${optionKey}`}
-                              className="text-gray-700"
-                              dangerouslySetInnerHTML={{ __html: optionValue }}
-                            ></label>
-                          </div>
-                        )
-                      );
-                    })}
-                  </div>
+            {questions.map((q, index) => (
+              <div key={q._id} className="mb-6">
+                <h2
+                  className="font-semibold text-gray-800 mb-2"
+                  dangerouslySetInnerHTML={{ __html: `${index + 1}) ${q.question}` }}
+                ></h2>
+                <div className="space-y-2">
+                  {["a", "b", "c", "d", "e"].map((optionKey) => {
+                    const optionValue = q[optionKey as keyof Question];
+                    const isSelected =
+                      selectedAnswers.find((answer) => answer._id === q._id)?.selectedValue ===
+                      optionValue;
+                    return (
+                      optionValue && (
+                        <div key={optionKey} className="flex items-center">
+                          <input
+                            type="radio"
+                            id={`q${index}_o${optionKey}`}
+                            name={`q${index}`}
+                            value={optionValue}
+                            className="mr-2 w-5 h-5 text-red-600 border-2 border-gray-300 cursor-pointer"
+                            onChange={(e) => handleOptionChange(q._id, e.target.value)}
+                            checked={isSelected}
+                          />
+                          <label
+                            htmlFor={`q${index}_o${optionKey}`}
+                            className="text-gray-700"
+                            dangerouslySetInnerHTML={{ __html: optionValue }}
+                          ></label>
+                        </div>
+                      )
+                    );
+                  })}
                 </div>
-              ))}
-            {/* <div className="mt-6 flex justify-center">
-              <button
-                type="submit"
-                className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg"
-              >
-                Submit
-              </button>
-            </div> */}
+                <button
+                  type="button"
+                  onClick={() => clearSelection(q._id)}
+                  className="text-sm text-red-500 mt-5"
+                >
+                  Clear Selection
+                </button>
+              </div>
+            ))}
           </form>
         </div>
-
-        {/* Timer */}
         <div className="fixed bottom-5 right-5 bg-red-600 text-white font-bold text-lg px-4 py-2 rounded-lg shadow-lg">
-          Time Remaining:{" "}
-          {Math.floor(timer / 3600)
-            .toString()
-            .padStart(2, "0")}
-          :
-          {Math.floor((timer % 3600) / 60)
-            .toString()
-            .padStart(2, "0")}
-          :{(timer % 60).toString().padStart(2, "0")}
+          Time Remaining: {Math.floor(timer / 60)}:{timer % 60 < 10 ? `0${timer % 60}` : timer % 60}
         </div>
       </div>
     </main>
