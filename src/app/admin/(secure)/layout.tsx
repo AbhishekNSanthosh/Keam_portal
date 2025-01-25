@@ -8,7 +8,11 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const { data: session, status } = useSession();
   const router = useRouter();
 
@@ -17,11 +21,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     if (!session?.user.isAdmin && status === "authenticated") {
       // Redirect non-admin users to the homepage or another page
       router.push("/");
-    }else 
-    if (!session && status === "unauthenticated") {
-      // If not authenticated, redirect to login
-      router.push("/admin/login");
-    }
+    } else
+      setTimeout(() => {
+        if (!session && status === "unauthenticated") {
+          // If not authenticated, redirect to login
+          router.push("/admin/login");
+        }
+      }, 300);
   }, [session, status, router]);
 
   return (

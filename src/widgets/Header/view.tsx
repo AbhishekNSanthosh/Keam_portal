@@ -71,7 +71,7 @@ export default function Header() {
           </div>
         </div>
         <div className="flex-1 flex flex-row items-center justify-end gap-3">
-          <span className="capitalize">Hey, {session?.user?.firstName}{" "}{session?.user.lastName}</span>
+        <span className="capitalize text-xl font-semibold text-red-600">Hey, {session?.user?.firstName}{" "}{session?.user.lastName}👋</span>
           <div
             className="border-2 border-red-600 p-1 rounded-full cursor-pointer"
             onClick={openModal}

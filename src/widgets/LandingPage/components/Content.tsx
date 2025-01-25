@@ -12,14 +12,25 @@ export default function Content() {
           Exam Instructions
         </h1>
         <ul className="list-disc list-inside space-y-2 text-gray-700">
-  <li className="text-gray-600 text-sm">Total number of questions: 100.</li>
-  <li className="text-gray-600 text-sm">Total Marks: 400</li>
-  <li className="text-gray-600 text-sm">Marks awarded for correct answer: 4.</li>
-  <li className="text-gray-600 text-sm">Marks deducted for wrong answer: 1.</li>
-  <li className="text-gray-600 text-sm">Exam duration: 120 mins.</li>
-  <li className="text-gray-600 text-sm">Do not hit back button while attending the exam.</li>
-</ul>
-
+          <li className="text-gray-600 text-sm">
+            Total number of questions: 100.
+          </li>
+          <li className="text-gray-600 text-sm">Total Marks: 400</li>
+          <li className="text-gray-600 text-sm">
+            Marks awarded for correct answer: 4.
+          </li>
+          <li className="text-gray-600 text-sm">
+            Marks deducted for wrong answer: 1.
+          </li>
+          <li className="text-gray-600 text-sm">Exam duration: 120 mins.</li>
+          <li className="text-gray-600 text-sm">
+            Do not hit the back button while attending the exam.
+          </li>
+          <li className="text-gray-600 text-sm">
+            If you hit the back button or reload the page, you will need to
+            start the exam from the beginning.
+          </li>
+        </ul>
 
         <div className="mt-6">
           <p className="text-sm text-gray-500">

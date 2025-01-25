@@ -35,7 +35,7 @@ export default function Success() {
     <main>
       {showLoader && <PreLoader/>}
       <Header />
-      <div className="pt-[100px] w-full flex items-center justify-center">
+      <div className="pt-[100px] h-[100vh] w-full flex items-center justify-center">
         <Image
           src={"/done.svg"}
           alt=""
