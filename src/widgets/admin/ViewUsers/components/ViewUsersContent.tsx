@@ -25,8 +25,8 @@ const ViewUserContent = () => {
   useEffect(() => {
     const fetchStudents = async () => {
       try {
-        const response = await fetch("/api/admin/view-users",{
-          method:"POST"
+        const response = await fetch("/api/admin/view-users", {
+          method: "POST",
         }); // New API endpoint
         if (response.ok) {
           const data: ApiResponse = await response.json();
@@ -64,7 +64,8 @@ const ViewUserContent = () => {
               >
                 <div className="space-y-2">
                   <p className="text-lg font-medium text-gray-700">
-                    <strong>Name:</strong> {student.firstName} {student.lastName}
+                    <strong>Name:</strong> {student.firstName}{" "}
+                    {student.lastName}
                   </p>
                   <p className="text-gray-600">
                     <strong>Email:</strong> {student.email}
@@ -84,4 +85,4 @@ const ViewUserContent = () => {
   );
 };
 
-export default ViewUserContent;
+export default ViewStudentsPage;

@@ -21,6 +21,10 @@ const UserSchema = new Schema({
         type: String,
         required: false  // Optional field
     },
+    timeRemaining: {
+        type: Number,
+        default: 7200
+    },
     score: {
         type: Number,
         default: 0
@@ -31,7 +35,7 @@ const UserSchema = new Schema({
                 type: Schema.Types.ObjectId,
                 ref: "Question"
             },
-            submittedAnswer: {
+            selectedValue: {
                 type: String
             }
         }

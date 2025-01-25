@@ -1,7 +1,7 @@
 import customToast from "@components/CustomToast";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 
 interface Question {
   _id: string;
@@ -20,7 +20,11 @@ interface Question {
 
 interface ApiResponse {
   message: string;
-  data: Question[];
+  data: {
+    newQuestions: Question[];
+    remainingTime: number;
+    attemptedAnswers: { _id: string; selectedValue: string }[];
+  };
 }
 
 interface ExamContentProps {
@@ -28,11 +32,12 @@ interface ExamContentProps {
 }
 
 export default function ExamContent({ handleLoading }: ExamContentProps) {
-  const [timer, setTimer] = useState(7200); // Initial timer set to 60 seconds
+  const [timer, setTimer] = useState(7200); // Initial timer set to 2 hours
   const [questions, setQuestions] = useState<Question[]>([]);
   const [selectedAnswers, setSelectedAnswers] = useState<
     { _id: string; selectedValue: string }[]
   >([]);
+  const [noOfChanges, setNoOfChanges] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { data: session } = useSession();
@@ -54,6 +59,44 @@ export default function ExamContent({ handleLoading }: ExamContentProps) {
 
       return updatedAnswers;
     });
+
+    setNoOfChanges((prev) => prev + 1);
+    if (!finished && isUnsavedChanges && noOfChanges >= 4) {
+      saveProgress();
+      setNoOfChanges(0);
+    }
+  };
+
+  const saveProgress = async () => {
+    console.log("Saving progress...");
+    try {
+      const res = await fetch("/api/exam/save-progress", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId: session?.user?.id,
+          questionsAttempted: selectedAnswers,
+          remainingTime: timer,
+        }),
+      });
+
+      if (!res.ok) {
+        throw new Error(`Failed to save progress: ${res.status}`);
+      }
+
+      const result = await res.json();
+      console.log("Progress saved:", result);
+      setIsUnsavedChanges(false);
+    } catch (error) {
+      console.error("Error saving progress:", error);
+      customToast({
+        message: "Failed to save progress",
+        type: "error",
+        showIcon: true,
+      });
+    }
   };
 
   const handleSubmit = async () => {
@@ -102,6 +145,9 @@ export default function ExamContent({ handleLoading }: ExamContentProps) {
       const res = await fetch("/api/question/fetch", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId: session?.user?.id,
+        }),
       });
 
       if (!res.ok) {
@@ -109,8 +155,15 @@ export default function ExamContent({ handleLoading }: ExamContentProps) {
       }
 
       const data: ApiResponse = await res.json();
+
       if (data.message === "Data fetch successful") {
-        setQuestions(data.data);
+        const { remainingTime, attemptedAnswers, newQuestions } = data.data;
+        setQuestions(newQuestions);
+        setTimer(remainingTime);
+        setSelectedAnswers(attemptedAnswers);
+      } else {
+        console.error("Unexpected API response format:", data);
+        setQuestions([]); // Set fallback empty array
       }
     } catch (error: any) {
       console.error("Failed to fetch questions:", error);
@@ -122,8 +175,10 @@ export default function ExamContent({ handleLoading }: ExamContentProps) {
   };
 
   useEffect(() => {
-    getQuestions();
-  }, []);
+    if (session && loading) {
+      getQuestions();
+    }
+  }, [session]);
 
   useEffect(() => {
     if (timer > 0 && !finished) {
@@ -189,43 +244,44 @@ export default function ExamContent({ handleLoading }: ExamContentProps) {
               handleSubmit();
             }}
           >
-            {questions.map((q, index) => (
-              <div key={q._id} className="mb-6">
-                <h2
-                  className="font-semibold text-gray-800 mb-2"
-                  dangerouslySetInnerHTML={{
-                    __html: `${index + 1}) ${q.question}`,
-                  }}
-                ></h2>
-                <div className="space-y-2">
-                  {["a", "b", "c", "d", "e"].map((optionKey) => {
-                    const optionValue = q[optionKey as keyof Question];
-                    return (
-                      optionValue && (
-                        <div key={optionKey} className="flex items-center">
-                          <input
-                            type="radio"
-                            id={`q${index}_o${optionKey}`}
-                            name={`q${index}`}
-                            value={optionValue}
-                            className="mr-2 w-5 h-5 text-red-600 border-2 border-gray-300 cursor-pointer"
-                            required
-                            onChange={(e) =>
-                              handleOptionChange(q._id, e.target.value)
-                            }
-                          />
-                          <label
-                            htmlFor={`q${index}_o${optionKey}`}
-                            className="text-gray-700"
-                            dangerouslySetInnerHTML={{ __html: optionValue }}
-                          ></label>
-                        </div>
-                      )
-                    );
-                  })}
+            {Array.isArray(questions) &&
+              questions.map((q, index) => (
+                <div key={q._id} className="mb-6">
+                  <h2
+                    className="font-semibold text-gray-800 mb-2"
+                    dangerouslySetInnerHTML={{
+                      __html: `${index + 1}) ${q.question}`,
+                    }}
+                  ></h2>
+                  <div className="space-y-2">
+                    {["a", "b", "c", "d", "e"].map((optionKey) => {
+                      const optionValue = q[optionKey as keyof Question];
+                      return (
+                        optionValue && (
+                          <div key={optionKey} className="flex items-center">
+                            <input
+                              type="radio"
+                              id={`q${index}_o${optionKey}`}
+                              name={`q${index}`}
+                              value={optionValue}
+                              className="mr-2 w-5 h-5 text-red-600 border-2 border-gray-300 cursor-pointer"
+                              required
+                              onChange={(e) =>
+                                handleOptionChange(q._id, e.target.value)
+                              }
+                            />
+                            <label
+                              htmlFor={`q${index}_o${optionKey}`}
+                              className="text-gray-700"
+                              dangerouslySetInnerHTML={{ __html: optionValue }}
+                            ></label>
+                          </div>
+                        )
+                      );
+                    })}
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
             <div className="mt-6 flex justify-center">
               <button
                 type="submit"
@@ -241,14 +297,13 @@ export default function ExamContent({ handleLoading }: ExamContentProps) {
         <div className="fixed bottom-5 right-5 bg-red-600 text-white font-bold text-lg px-4 py-2 rounded-lg shadow-lg">
           Time Remaining:{" "}
           {Math.floor(timer / 3600)
-    .toString()
-    .padStart(2, "0")}
-  :
-  {Math.floor((timer % 3600) / 60)
-    .toString()
-    .padStart(2, "0")}
-  :
-  {(timer % 60).toString().padStart(2, "0")}
+            .toString()
+            .padStart(2, "0")}
+          :
+          {Math.floor((timer % 3600) / 60)
+            .toString()
+            .padStart(2, "0")}
+          :{(timer % 60).toString().padStart(2, "0")}
         </div>
       </div>
     </main>
