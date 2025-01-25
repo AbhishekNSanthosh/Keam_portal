@@ -18,8 +18,11 @@ export const POST = async (req: Request) => {
     // Connect to the database
     await connectToDB();
 
-    // Initialize the score
+    // Initialize the score and counters
     let score = 0;
+    let attemptedQuestions = 0;
+    let correctAnswers = 0;
+    let incorrectAnswers = 0;
 
     // Iterate through each answer
     for (const answer of answers) {
@@ -28,19 +31,31 @@ export const POST = async (req: Request) => {
 
       // If question not found, continue to the next answer
       if (!question) continue;
+
+      // Increment attempted questions count
+      attemptedQuestions++;
+
       console.log(answer.selectedValue, "===", question.correct);
+
       // Check if chosen option matches the correct option in the question
       if (answer.selectedValue === question.correct) {
-        // If correct, increment score by 4
+        // If correct, increment score by 4 and correct answers count
         score += 4;
+        correctAnswers++;
       } else {
-        // If incorrect, decrement score by 1
+        // If incorrect, decrement score by 1 and incorrect answers count
         score -= 1;
+        incorrectAnswers++;
       }
     }
 
-    // Update the User model with the calculated score
-    await User.findByIdAndUpdate(userId, { score: score });
+    // Update the User model with the calculated score and other details
+    await User.findByIdAndUpdate(userId, {
+      score,
+      attemptedQuestions,
+      correctAnswers,
+      incorrectAnswers,
+    });
 
     // Prepare response with the calculated score
     const response = {

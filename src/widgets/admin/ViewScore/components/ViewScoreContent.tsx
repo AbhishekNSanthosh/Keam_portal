@@ -8,6 +8,9 @@ interface Student {
   firstName: string;
   lastName: string;
   score: number;
+  attemptedQuestions: number;
+  correctAnswers: number;
+  incorrectAnswers: number;
 }
 
 const ViewScoreContent = () => {
@@ -57,14 +60,21 @@ const ViewScoreContent = () => {
                 } rounded-lg hover:shadow-md transition`}
               >
                 <p className="text-lg font-medium text-gray-700 capitalize">
-                  <strong className={`${
-                  [1, 2, 3].includes(index + 1)
-                    ? "text-red-600"
-                    : ""
-                }`}>Rank {index + 1}:</strong> {student.firstName}{" "}
-                  {student.lastName}
+                  <strong
+                    className={`${
+                      [1, 2, 3].includes(index + 1) ? "text-red-600" : ""
+                    }`}
+                  >
+                    Rank {index + 1}:
+                  </strong>{" "}
+                  {student.firstName} {student.lastName}
                 </p>
-                <p className="text-gray-600">Score: {student.score}</p>
+                  <p className="text-gray-600">Score: {student.score}</p>
+                <div className="">
+                  <p className="text-gray-600">Attempted Questions: {student?.attemptedQuestions}</p>
+                  <p className="text-gray-600">Correct Answers: {student?.correctAnswers}</p>
+                  <p className="text-gray-600">Incorrect Answers: {student?.incorrectAnswers}</p>
+                </div>
               </div>
             ))}
           </div>

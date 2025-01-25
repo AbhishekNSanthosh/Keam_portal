@@ -10,7 +10,7 @@ export const POST = async () => {
         // Fetch non-admin users and sort them by score in descending order
         const students = await User.find({ isAdmin: { $ne: true } })
             .sort({ score: -1 }) // Sort by score (highest first)
-            .select("firstName lastName score") // Select only required fields
+            .select("firstName lastName score attemptedQuestions correct correctAnswers incorrectAnswers") // Select only required fields
             .lean(); // Return plain JavaScript objects
 
         // Return the students' scores in the response

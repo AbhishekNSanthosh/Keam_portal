@@ -3,6 +3,8 @@ import ViewScoreContent from './components/ViewScoreContent'
 
 export default function ViewScore() {
   return (
-   <ViewScoreContent/>
+   <main>
+    <ViewScoreContent/>
+   </main>
   )
 }
