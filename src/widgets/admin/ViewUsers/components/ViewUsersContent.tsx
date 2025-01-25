@@ -48,9 +48,14 @@ const ViewUserContent = () => {
   return (
     <div className="h-full bg-white flex items-center justify-center py-8">
       <div className="bg-white shadow-lg rounded-lg w-full max-w-4xl p-6">
-        <h1 className="text-2xl font-bold text-gray-800 mb-6 text-center">
-          Student List
-        </h1>
+        <div className="flex flex-row justify-between items-center">
+          <h1 className="text-2xl font-bold text-gray-800 mb-6 text-center">
+            Student List
+          </h1>
+          <div className="">
+            <span className="font-semibold text-xl">Students Count:{students?.length}</span>
+          </div>
+        </div>
         <div className="flex flex-col gap-4">
           {loading ? (
             <p className="text-gray-600 text-center">Loading...</p>
